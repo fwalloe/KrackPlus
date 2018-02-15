@@ -1,9 +1,21 @@
 #:kivy 1.0.9
 
+	canvas.before:
+    		Color:
+        		rgb: 0, 1, 3
+
+	    	Rectangle:
+			pos = self.pos
+			size = self.size
+
 	canvas:
 		Rectangle:
-            	pos: self.center_x-5, 0
-           	size: 10, self.height
+        	    	pos: self.center_x-5, 0
+        	   	size: 20, self.height
 
 	Label:
-		size: self.texture_size
+		font_size: 70  
+		center_x: root.width * 3 / 4
+		top: root.top - 50
+		text: "0"
+    
