@@ -16,7 +16,7 @@ cd ../krackattack/
 #Let user choose whether to reboot computer
 ## NOTE not implemented
 
-#### NOTE: not done
+#### NOTE: next sections not done
 
 #RUN: systool -vm ath9k_htc
 ## To check: the nohwcript/.. param has been set.

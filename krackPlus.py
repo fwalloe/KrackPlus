@@ -24,34 +24,31 @@ green = [0,1,0,1]
 import subprocess
 
 
+
 # Defines the instance of the widget.
 class KrackWidget(Widget):
 	pass # used to keep a class valid even though it doesn't contain anything
 
-
-
-class DisplayRows(GridLayout):
-    def __init__(self, **kwargs):
-        self.cols = 2
-        self.row = 2
-
-# 
+# Sets up 
 def callback(instance):
-    print('The button <%s> is being pressed' % instance.text)
+	print('Processing... ' % instance.text)
+	### NOTE move this out of the class to set scan for vulnerable clients whenever the program starts.
+#	subprocess.call("./prepareClientScan.sh")
+
 
 # Setup: installs necessary software and sets up a test network 
 class ClientScanSetup(Widget):	
 	btn1 = Button(text='Check whether device is vulnerable')
 	btn1.bind(on_press=callback)	
-	#Should use subprocess to run a bash script
 
 class KrackPlusApp(App):
 	def build(self):
 		Window.size = (820, 580)	
 		#TODO should be a nice gray or something
 		Window.clearcolor = (.12,.12,.12,.12)
-		DisplayRows()
-		ClientScanSetup()
+		
+		return ClientScanSetup()
+
 				
 
 
