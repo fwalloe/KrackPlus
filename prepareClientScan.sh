@@ -1,5 +1,8 @@
 #!/bin/bash/
 
+#### NOTE: Only install dependencies if not already installed. See second answer here for how to do that: 
+# https://stackoverflow.com/questions/1298066/check-if-a-package-is-installed-and-then-install-it-if-its-not
+
 # Install dependencies
 apt-get -y update && apt-get install -y libnl-3-dev libnl-genl-3-dev pkg-config libssl-dev net-tools git sysfsutils python-scapy python-pycryptodome
 
