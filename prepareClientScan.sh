@@ -8,6 +8,7 @@ apt-get -y update && apt-get install -y libnl-3-dev libnl-genl-3-dev pkg-config 
 
 
 #Checks whether dependencies are already installed; if not, installs them.
+## NOTE / TODO maybe need to use gksudo with GUI
 while read packages; do
 	PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $packages | grep "install ok installed")
 	echo "Checking for $packages": $PKG_OK
