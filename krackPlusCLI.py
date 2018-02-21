@@ -11,7 +11,7 @@ def main():
     parse.add_option('--attack', '-a', default=False, help="This option will run attack against the given IP")
     
     #Adding option to install dependencies and turn of hardware encryption on NIC....etc.
-    parse.add_option('--prepare', '-p', defaul=False, help="This option will prepare for scans and attacks. Takes 'scan', 'attack' for paramters for now.")
+    parse.add_option('--prepare', '-p', default=False, help="This option will prepare for scans and attacks. Takes 'scan', 'attack' for paramters for now.")
     
     options, args = parse.parse_args()
     isClientPreparedScan = False
@@ -39,13 +39,13 @@ def main():
     if options.scan != False:
         if isClientPreparedScan:
             print("Scanning" + options.scan + ":")
-            subprocess.call(["vulnerabilityScan.sh"]) #TODO usikker på filnavnet her, kodet i bitbucket av alle ting.
+            subprocess.call(["vulnerabilityScan.sh"]) #TODO usikker paa filnavnet her, kodet i bitbucket av alle ting.
     
     # Running attack scripts
     elif options.attack != False:
         if isClientPreparedAttack:
             print("Performing key reinstallation attack against " + options.attack)
-            subprocess.call(["
+            #subprocess.call(["
         
 if __name__ == '__main__':
     main()
