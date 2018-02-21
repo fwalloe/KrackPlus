@@ -39,7 +39,7 @@ def main():
     if options.scan != False:
         if isClientPreparedScan:
             print("Scanning" + options.scan + ":")
-            subprocess.call(["vulnerabilityScan.sh"]) #usikker på filnavnet her, kodet i bitbucket av alle ting.
+            subprocess.call(["vulnerabilityScan.sh"]) #TODO usikker på filnavnet her, kodet i bitbucket av alle ting.
     
     # Running attack scripts
     elif options.attack != False:
