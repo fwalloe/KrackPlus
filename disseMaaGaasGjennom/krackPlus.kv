@@ -1,0 +1,33 @@
+#:kivy 1.0.9
+
+<KrackWidget>:
+	canvas.before:
+		Color:
+			rgba: 1, 1, 1, 1
+	    	Rectangle:
+			pos = self.pos
+			size = self.size
+
+	canvas:
+
+		Rectangle:
+        	    	pos: self.center_x-5, 0
+        	   	size: 20, self.height
+
+	Label:
+		font_size: 70  
+		center_x: root.width * 3 / 4
+		top: root.top - 50
+		text: "0"
+
+	
+	Button:
+		font_size: 45
+
+<ClientScanSetup>
+	GridLayout:
+		rows: 2
+		cols: 2
+		padding: 10
+		padding: 10
+		Label: text: 'Hello though'
