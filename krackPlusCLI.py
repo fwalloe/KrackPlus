@@ -40,7 +40,7 @@ def main():
             isClientPreparedAttack = True
         else:
             print("Already prepared for" + options.prepare + ". Please continue..")
-                                                                                  
+
     # Running scan scripts
     if options.scan != False:
         if isClientPreparedScan:
