@@ -43,8 +43,8 @@ def main():
 
     # Running scan scripts
     if options.scan != False:
-        if isClientPreparedScan:
-            print("Scanning" + options.scan + ":")
+        if isClientPreparedScan == False:
+            print("Scanning " + options.scan + ":")
             subprocess.call(["vulnerabilityScan.sh"])  #                    TODO Wrong filename, but this script exists
     
     # Running attack scripts
