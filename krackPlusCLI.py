@@ -3,6 +3,8 @@
 import optparse
 import subprocess
 
+prepareClientScan = "./prepareClientScan.sh | ./outputHandler.sh $1"
+
 def main():
     parse = optparse.OptionParser()
     
@@ -22,7 +24,7 @@ def main():
     # Running scan scripts
     if options.scan != False:
         print("Scanning " + options.scan + ":")
-        subprocess.call(["./prepareClientScan.sh"])
+        subprocess.call([prepareClientScan])
         subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"]) 
     
     # Running attack scripts
