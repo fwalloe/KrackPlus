@@ -6,7 +6,7 @@ import subprocess
 def main():
     parse = optparse.OptionParser();
     
-    ## TODO er det mulig å gjøre en slik type scan? I sciptet vi kjørte måtte vi sette opp et nettverk som man så måtte logge seg på. 
+    ## TODO Don't think it's possible to run a scan like this; the scan we ran earlier required us to set up a network that targets had to connect to. Perhaps we can force nearby clients to connect, but don't think we can just specify an IP
 
     #Adding option to run scan
     parse.add_option('--scan', '-s', default=False, help="This option will run a vulnerability scan against the given IP")
@@ -17,7 +17,7 @@ def main():
     #Adding option to install dependencies and turn of hardware encryption on NIC....etc.
     parse.add_option('--prepare', '-p', default=False, help="This option will prepare for scans and attacks. Takes 'scan', 'attack' for paramters for now.")
     
-    ## TODO savner en kommentar her. Hva skjer her? Er det slik at vi sjekker om man allerede har satt opp requirements? I så fall vil ikke dette lagres mellom ver kjøring av programmet, slik det er satt opp nå. 
+    ## TODO add comment to explain what happens here. If the intention is to avoid running prepare scans several times, then this will not work: can save to file to make it persistent. 
     options, args = parse.parse_args()
     isClientPreparedScan = False
     isClientPreparedAttack = False
