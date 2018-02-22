@@ -51,14 +51,22 @@ def main():
             with open('networkCredentials.txt', 'a') as netCredentials:
                 netCredentials.write(options.ssid + '\n' + options.password)
         log.info("Scanning " + options.ssid + " for KRACK vulnerable devices:")
-        subprocess.call(["./prepareClientScan.sh"])
-        subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"])
-        subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
+        
+        try:
+            subprocess.call(["./prepareClientScan.sh"])
+            subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"])
+            subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
+        except KeyboardInterrupt:
+            log.info("Generating PDF with findings ...")
+        # if --os-detection:
+        if options.os:
+            print "NMAP"
         
     # Running attack scripts
     elif options.attack:
         print("Performing key reinstallation attack against " + options.attack)
         #TODO subprocess, run attack script.
+
     # Must specify an option    
     else:
         log.warn("No option was given, please see usage below and try again!")
