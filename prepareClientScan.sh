@@ -20,11 +20,11 @@ while read packages; do
 # Gets the list of dependencies from a file
 done <dependenciesClientScan
 
-# Compile modified hostapd instance
-## NOTE this only needs to be done once; make check to avoid doing it every time
+# Make modified hostapd instance. Redirects all output away from user
+## TODO NOTE this only needs to be done once; make check to avoid doing it every time
 cd ./findVulnerable/hostapd/
-cp defconfig .config
-make -j 2
+cp defconfig .config 
+make -j 2 > /dev/null
 
 #Disable network
 nmcli radio wifi off
