@@ -22,7 +22,7 @@ done <dependenciesClientScan
 
 # Compile modified hostapd instance
 ## NOTE this only needs to be done once; make check to avoid doing it every time
-cd /findVulnerable/hostapd/
+cd ./findVulnerable/hostapd/
 cp defconfig .config
 make -j 2
 
