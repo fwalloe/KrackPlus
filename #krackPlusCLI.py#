@@ -6,8 +6,9 @@ import subprocess
 def main():
     parse = optparse.OptionParser()
     
+    
     #Adding option to run scan.                                                             TODO Task 2: Make scan of vulnerability work
-    parse.add_option('--scan', '-s', default=False, help="This option will run a vulnerability scan against the given IP")
+    parse.add_option('--scan', '-s', default=False, help="This option will run a vulnerability scan against a client, however you'll need SSID and password.")
 
     #Adding option to run attack against .....                                              TODO Senere, one thing at a time.
     parse.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against the given IP")
@@ -25,7 +26,7 @@ def main():
     if options.prepare == 'scan':
         if isClientPreparedScan == False:
             print("Preparing client for " + options.prepare + " ...")
-            subprocess.call(["./prepareClientScan.sh"])
+            subprocess.call(["prepareClientScan.sh"])
             isClientPreparedScan = True
         else:
             print("Already prepared for" + options.prepare + ". Please continue..")
