@@ -7,50 +7,28 @@ def main():
     parse = optparse.OptionParser()
     
     #Adding option to run scan.                                                             TODO Task 2: Make scan of vulnerability work
-    parse.add_option('--scan', '-s', default=False, help="This option will run a vulnerability scan against the given IP")
+    parse.add_option('--scan', '-s', default=False, help="This option will create a network with ssid 'testnetwork' where the default password is abcdefgh."
+                     " Simply connect to the network and the scan will be executed against the connected device.")
 
-    #Adding option to run attack against .....                                              TODO Senere, one thing at a time.
-    parse.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against the given IP")
-    
-    #Adding option to install dependencies and turn of hardware encryption on NIC....etc.   TODO Task 1: Make dependencies script work, and make sure all is good after doing this option.
-    parse.add_option('--prepare', '-p', default=False, help="This option will prepare for scans and attacks. Takes 'scan', 'attack' for paramters for now.")
-    
+    parse.add_option('--ssid', default='testnetwork', help="Use this option to set the SSID of the created network.")
+    parse.add_option('--password', '-p', default='abcdefg', help="Use this option to set the password of the created network."
+                     " Password length has to be 8 characters or more!")
+
+    #Adding option to run attack against .....   
+    parse.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....")
+
     options, args = parse.parse_args()
-
-    # These bools are to be set to true, if client is already prepared.                     TODO Make a script to check.
-    isClientPreparedScan = False
-    isClientPreparedAttack = False
-    
-    # Running prepare scripts for scan
-    if options.prepare == 'scan':
-        if isClientPreparedScan == False:
-            print("Preparing client for " + options.prepare + " ...")
-            subprocess.call(["./prepareClientScan.sh"])
-            isClientPreparedScan = True
-        else:
-            print("Already prepared for" + options.prepare + ". Please continue..")
-    
-    #Running prepare scripts for attack 
-    elif options.prepare == 'attack':
-        if isClientPreparedAttack == False:
-            print("Preparing client for " + options.prepare + " ...")
-#                                                                                           TODO Create this script.
-            subprocess.call(["prepareClientAttack.sh"])
-            isClientPreparedAttack = True
-        else:
-            print("Already prepared for" + options.prepare + ". Please continue..")
 
     # Running scan scripts
     if options.scan != False:
-        if isClientPreparedScan == False:
-            print("Scanning " + options.scan + ":")
-            subprocess.call(["vulnerabilityScan.sh"])  #                    TODO Wrong filename, but this script exists
+        print("Scanning " + options.scan + ":")
+        subprocess.call(["./prepareClientScan.sh"])
+        subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"]) 
     
     # Running attack scripts
     elif options.attack != False:
-        if isClientPreparedAttack == False:
-            print("Performing key reinstallation attack against " + options.attack)
-            #TODO subprocess, run attack script.
+        print("Performing key reinstallation attack against " + options.attack)
+        #TODO subprocess, run attack script.
         
 if __name__ == '__main__':
     main()

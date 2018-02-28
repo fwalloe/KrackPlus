@@ -1,0 +1,83 @@
+	Hey, we are having some problems running the "krack-all-zero-tk.py".
+
+	Could you be so kind and briefly describe the process?
+
+	We are using Kali and an external NIC (Alfa AWUS036NH). 
+
+	When trying to run the script, we do not have a NIC in monitory. Our ifconfig is simply:
+	eth0(integrated NIC)
+	lo
+	eth1(Alfa NIC) 
+
+	However, when we try to run the script using these paramteres:
+	python krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa
+
+	Our ifconfig changes to:
+	eth0
+	lo
+	wlan0
+	wlan1
+	wlan0mon
+	wlan1sta1
+
+	and the script gives the following error output:
+
+		===[ KRACK Attacks against Linux/Android by Mathy Vanhoef ]===
+
+	[12:44:59] Note: remember to disable Wi-Fi in your network manager so it doesn't interfere with this script
+	[12:44:59] Note: keep >1 meter between both interfaces. Else packet delivery is unreliable & target may disconnect
+	[12:45:00] Searching for target network on other channels
+	[12:45:03] Target network 90:4e:2b:c6:86:14 detected on channel 5
+	[12:45:03] Will create rogue AP on channel 11
+	[12:45:03] Setting MAC address of wlan0 to 90:4e:2b:c6:86:14
+	Traceback (most recent call last):
+	  File "krack-all-zero-tk.py", line 1018, in <module>
+	    attack.run(strict_echo_test=args.strict_echo_test)
+	  File "krack-all-zero-tk.py", line 923, in run
+	    self.hostapd = subprocess.Popen(["../hostapd/hostapd", "hostapd_rogue.conf", "-dd", "-K"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	  File "/usr/lib/python2.7/subprocess.py", line 394, in __init__
+	    errread, errwrite)
+	  File "/usr/lib/python2.7/subprocess.py", line 1047, in _execute_child
+	    raise child_exception
+	OSError: [Errno 2] No such file or directory
+	[12:45:04] Closing hostapd and cleaning up ...
+
+	After this, we tried to run the script again using these parameters:
+	python krack-all-zero-tk.py wlan0mon wlan0 Brennbakkvegen194 --target ....
+
+	wlan0, will be the integrated NIC, as this should be disabled(?) we also tried wlan1 instead of wlan0 as well. 
+
+	The script then gave us the following error output:
+
+		===[ KRACK Attacks against Linux/Android by Mathy Vanhoef ]===
+
+	[12:51:08] Note: remember to disable Wi-Fi in your network manager so it doesn't interfere with this script
+	[12:51:08] Note: keep >1 meter between both interfaces. Else packet delivery is unreliable & target may disconnect
+	[12:51:09] Searching for target network on other channels
+	[12:51:13] No beacon received of network <Brennbakkvegen194>. Is monitor mode working? Did you enter the correct SSID?
+	[12:51:13] Closing hostapd and cleaning up ...
+
+	So after we got this output, we did "nmcli radio wifi off" and tried again. We then got: 
+
+		===[ KRACK Attacks against Linux/Android by Mathy Vanhoef ]===
+
+	[12:57:24] Note: remember to disable Wi-Fi in your network manager so it doesn't interfere with this script
+	[12:57:24] Note: keep >1 meter between both interfaces. Else packet delivery is unreliable & target may disconnect
+	wlan0mon: ERROR while getting interface flags: No such device
+	Traceback (most recent call last):
+	  File "krack-all-zero-tk.py", line 1018, in <module>
+	    attack.run(strict_echo_test=args.strict_echo_test)
+	  File "krack-all-zero-tk.py", line 880, in run
+	    self.configure_interfaces()
+	  File "krack-all-zero-tk.py", line 850, in configure_interfaces
+	    subprocess.check_output(["ifconfig", self.nic_real, "down"])
+	  File "/usr/lib/python2.7/subprocess.py", line 223, in check_output
+	    raise CalledProcessError(retcode, cmd, output=output)
+	subprocess.CalledProcessError: Command '['ifconfig', 'wlan0mon', 'down']' returned non-zero exit status 255
+	[12:57:24] Closing hostapd and cleaning up ...
+
+
+	The tablet we want to try attack is further away than a meter, our external NIC is around 1.5m away from the attacker PC and even further away from the tablet. 
+
+	Clarification on how to proceed or if you could briefly describe the process, that would be highly appreciated. 
+

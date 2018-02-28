@@ -1,0 +1,6 @@
+
+	===[ KRACK Attacks against Linux/Android by Mathy Vanhoef ]===
+
+[12:32:55] Note: remember to disable Wi-Fi in your network manager so it doesn't interfere with this script[1;0m
+[12:32:55] Note: keep >1 meter between both interfaces. Else packet delivery is unreliable & target may disconnect[1;0m
+[12:32:55] Closing hostapd and cleaning up ...[1;0m

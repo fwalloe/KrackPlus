@@ -40,6 +40,7 @@ cd ../krackattack/
 #### NOTE: next sections not done
 
 #RUN: systool -vm ath9k_htc
+
 ## To check: the nohwcript/.. param has been set.
 
 #Look for key reinstallations in the 4-way handshake
