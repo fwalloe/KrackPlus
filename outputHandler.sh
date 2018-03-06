@@ -66,8 +66,8 @@ mac=$(printf $mac | uniq)
 for line in $mac; do
     if [[ $macIP = *":"* ]]; then
         #nmap -O $(printf $macIP | grep $line | awk '{print $2}')
-        printf $macIP | grep -E *$line* # | awk '{print $2}'
-        #printf $line
+        #printf $macIP | grep -E "$line" # | awk '{print $2}'
+        printf $macIP | awk '{ print $2 }'
     fi
 done
 
