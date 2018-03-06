@@ -32,9 +32,7 @@ def main():
             with open('networkCredentials.txt', 'a') as netCredentials:
                 netCredentials.write(options.ssid + '\n' + options.password)
         print("Scanning for KRACK vulnerability:")
-    
-    if options.scan != False:
-        print("Scanning " + options.scan + ":")
+        print("Scanning " + options.ssid + " for KRACK vulnerable devices:")
         subprocess.call(["./prepareClientScan.sh"])
         subprocess.call(["./findVulnerable/krackattack/krack-test-client.py > outputFromScan.txt"])
         subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
