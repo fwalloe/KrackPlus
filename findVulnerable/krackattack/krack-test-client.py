@@ -451,7 +451,7 @@ class KRAckAttackClient():
 		self.process_eth_rx(p)
 
 	def configure_interfaces(self):
-		log(STATUS, "Note: disable Wi-Fi in network manager & disable hardware encryption. Both may interfere with this script.")
+		#log(STATUS, "Note: disable Wi-Fi in network manager & disable hardware encryption. Both may interfere with this script.")
 
 		# 0. Some users may forget this otherwise
 		subprocess.check_output(["rfkill", "unblock", "wifi"])
@@ -521,7 +521,8 @@ class KRAckAttackClient():
 		elif self.test_tptk == KRAckAttackClient.TPTK_RAND:
 			hostapd_command(self.hostapd_ctrl, "TEST_TPTK_RAND")
 
-		log(STATUS, "Ready. Connect to this Access Point to start the tests. Make sure the client requests an IP using DHCP!", color="green")
+                log(STATUS, "Make sure the client requests an IP using DHCP!", color="orange")
+		log(STATUS, "Ready. Connect to this Access Point/Wi-Fi to start the tests.", color="green")
 
 		# Monitor both the normal interface and virtual monitor interface of the AP
 		self.next_arp = time.time() + 1
