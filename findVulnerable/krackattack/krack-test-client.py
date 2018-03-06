@@ -550,7 +550,7 @@ class KRAckAttackClient():
 			self.hostapd.wait()
 		if self.sock_mon: self.sock_mon.close()
 		if self.sock_eth: self.sock_eth.close()
-
+                subprocess.call('nmcli radio wifi on', shell=True)
 
 def cleanup():
 	attack.stop()
