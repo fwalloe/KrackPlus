@@ -4,16 +4,18 @@
 # https://stackoverflow.com/questions/1298066/check-if-a-package-is-installed-and-then-install-it-if-its-not
 
 # Install dependencies
-apt-get -y update && apt-get install -y libnl-3-dev libnl-genl-3-dev pkg-config libssl-dev net-tools git sysfsutils python-scapy python-pycryptodome
-
+echo "Setting up dependencies:"
 
 #Checks whether dependencies are already installed; if not, installs them.
 ## NOTE / TODO maybe need to use gksudo with GUI
 while read packages; do
 	PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $packages | grep "install ok installed")
-	echo "Checking for $packages": $PKG_OK
+	echo "Checking for $packages": "already installed"
 	if [ "" == "$PKG_OK" ]; then
+		
 		echo "Package $packages not found. Setting up $packages."
+		apt-get -y update && apt-get install -y libnl-3-dev libnl-genl-3-dev pkg-config libssl-dev net-tools git sysfsutils python-scapy python-pycryptodome > /dev/null
+
 		sudo apt-get --force-yes --yes install $packages
 	fi
 
