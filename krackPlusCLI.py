@@ -51,20 +51,27 @@ def main():
             #Write the credentials to file, so that they can be used next time the progran runs.
             with open('networkCredentials.txt', 'w') as netCredentials:
                 netCredentials.write(options.ssid + '\n' + options.password)
-            #
-            #sed -i '88s/.*/ssid=$SSID/' ./findVulnerable/hostapd/hostapd.conf.subprocess(["call"]
-            #sed -i '1146s/.*/wpa_passphrase=$password/' ./findVulnerable/hostapd/hostapd.conf
-
-	    HER
+        #Replace default credentials with user-supplied ones in hostapd   
+        i -sed "88s/.*/ssid=$(sed '1q;d' networkcredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
+        i -sed "1146s/.*/wpa_passphrase=$(sed '2q;d' networkcredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
+	    
         log.info("Scanning " + options.ssid + " for KRACK vulnerable devices:")
-        subprocess.call(["./prepareClientScan.sh"])
-        subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"])
-        subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
+
+        try:
+            subprocess.call(["./prepareClientScan.sh"])
+            subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"])
+            subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
+        except KeyboardInterrupt:
+            log.info("Generating PDF with findings ...")
+        # if --os-detection:
+        if options.os:
+            print "NMAP"
         
     # Running attack scripts
     elif options.attack:
         print("Performing key reinstallation attack against " + options.attack)
         #TODO subprocess, run attack script.
+
     # Must specify an option    
     else:
         log.warn("No option was given, please see usage below and try again!")
