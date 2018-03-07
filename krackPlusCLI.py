@@ -53,10 +53,8 @@ def main():
                 netCredentials.write(options.ssid + '\n' + options.password)
         #Replace default credentials with user-supplied ones in hostapd     
         log.info("Scanning " + options.ssid + " for KRACK vulnerable devices:")
-	print options.ssid
-	print options.password
         try:
-            #R
+            #Runs if user has specified custom wlan credentials
 	    if options.ssid and options.password:
                 subprocess.check_call(['./prepareClientScan.sh', 'customCredentials'])
             else:
