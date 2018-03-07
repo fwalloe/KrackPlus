@@ -1,8 +1,27 @@
 #!/usr/bin/env python
-
+import sys
 import optparse
 import subprocess
 import atexit
+import logging
+LOG_LEVEL = logging.DEBUG
+LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
+from colorlog import ColoredFormatter
+logging.root.setLevel(LOG_LEVEL)
+formatter = ColoredFormatter(LOGFORMAT)
+stream = logging.StreamHandler()
+stream.setLevel(LOG_LEVEL)
+stream.setFormatter(formatter)
+log = logging.getLogger('pythonConfig')
+log.setLevel(LOG_LEVEL)
+log.addHandler(stream)
+
+########   Examples which gives dirrent colored output    #################
+#log.debug("A quirky message only developers care about")             WHITE
+#log.info("Curious users might want to know this")                    GREEN
+#log.warn("Something is wrong and any user should be informed")       YELLOW
+#log.error("Serious stuff, this is red for a reason")                 RED
+#log.critical("OH NO everything is on fire")                          SUPER RED/ORANGE
 
 def main():
     parser = optparse.OptionParser()
@@ -22,7 +41,7 @@ def main():
                       " Password length has to be 8 characters or more!", dest='password')
     
     #Adding option to run attack against .....   
-    parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....")
+    parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
 
     options, args = parser.parse_args()
 
@@ -31,17 +50,20 @@ def main():
         if options.ssid or options.password:
             with open('networkCredentials.txt', 'a') as netCredentials:
                 netCredentials.write(options.ssid + '\n' + options.password)
-        print("Scanning for KRACK vulnerability:")
-        print("Scanning " + options.ssid + " for KRACK vulnerable devices:")
+        log.info("Scanning " + options.ssid + " for KRACK vulnerable devices:")
         subprocess.call(["./prepareClientScan.sh"])
-        subprocess.call(["./findVulnerable/krackattack/krack-test-client.py > outputFromScan.txt"])
+        subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"])
         subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
         
     # Running attack scripts
     elif options.attack:
         print("Performing key reinstallation attack against " + options.attack)
         #TODO subprocess, run attack script.
-        
+    # Must specify an option    
+    else:
+        log.warn("No option was given, please see usage below and try again!")
+        parser.print_help()
+
 if __name__ == '__main__':
     main()
 
