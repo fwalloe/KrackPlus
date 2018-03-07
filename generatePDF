@@ -1,0 +1,28 @@
+#This will be integrated in the scan parser script later
+
+ex -sc '3i|text to insert' -cx file.txt
+
+
+l#Probablyintegrate in main py program:
+#To make a 
+  import os  
+  os.system("pdflatex mylatex.tex")
+	
+You can use os.system("mv mylatex.pdf path/to/directory") to move the pdf to any specific location. 
+
+from: https://stackoverflow.com/questions/33207950/compile-latex-file-using-a-python-script
+
+#In order to use this successfully, we need to insert text on specific lines. We can perhaps do it like this:	
+
+https://stackoverflow.com/questions/13316437/insert-lines-in-a-file-starting-from-a-specific-line
+
+#Change ssid:
+
+#!/bin/bash
+
+SSID=$(sed '1q;d' networkCredentials.txt)
+password=$(sed '2q;d' networkCredentials.txt)
+
+sed -i '88s/.*/ssid=$SSID/' ./findVulnerable/hostapd/hostapd.conf
+sed -i '1146s/.*/wpa_passphrase=$password/' ./findVulnerable/hostapd/hostapd.conf
+
