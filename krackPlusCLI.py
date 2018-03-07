@@ -46,7 +46,7 @@ def main():
     options, args = parser.parse_args()
 
     # Running scan scripts
-    if options.scan:
+    ildf options.scan:
         if options.ssid or options.password:
             with open('networkCredentials.txt', 'a') as netCredentials:
                 netCredentials.write(options.ssid + '\n' + options.password)
