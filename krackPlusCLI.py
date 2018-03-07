@@ -36,7 +36,7 @@ def main():
     #Option to set the SSID for the created test network.
     parser.add_option('--set-ssid', default='testnetwork', help="Use this option to set the SSID for the created network.", dest='ssid')
 
-    #Option to set password for the created test network.
+    #Option kto set password for the created test network.
     parser.add_option('--set-password', default='abcdefgh', help="Use this option to set the password for the created network."
                       " Password length has to be 8 characters or more!", dest='password')
     
@@ -46,10 +46,16 @@ def main():
     options, args = parser.parse_args()
 
     # Running scan scripts
-    ildf options.scan:
-        if options.ssid or options.password:
-            with open('networkCredentials.txt', 'a') as netCredentials:
+    if options.scan:
+        if options.ssid and options.password:
+            #Write the credentials to file, so that they can be used next time the progran runs.
+            with open('networkCredentials.txt', 'w') as netCredentials:
                 netCredentials.write(options.ssid + '\n' + options.password)
+            #
+            #sed -i '88s/.*/ssid=$SSID/' ./findVulnerable/hostapd/hostapd.conf.subprocess(["call"]
+            #sed -i '1146s/.*/wpa_passphrase=$password/' ./findVulnerable/hostapd/hostapd.conf
+
+	    HER
         log.info("Scanning " + options.ssid + " for KRACK vulnerable devices:")
         subprocess.call(["./prepareClientScan.sh"])
         subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"])
