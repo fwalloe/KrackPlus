@@ -51,14 +51,19 @@ def main():
             #Write the credentials to file, so that they can be used next time the progran runs.
             with open('networkCredentials.txt', 'w') as netCredentials:
                 netCredentials.write(options.ssid + '\n' + options.password)
-        #Replace default credentials with user-supplied ones in hostapd   
-        i -sed "88s/.*/ssid=$(sed '1q;d' networkcredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
-        i -sed "1146s/.*/wpa_passphrase=$(sed '2q;d' networkcredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
-	    
+        #Replace default credentials with user-supplied ones in hostapd     
         log.info("Scanning " + options.ssid + " for KRACK vulnerable devices:")
-
+	print options.ssid
+	print options.password
         try:
-            subprocess.call(["./prepareClientScan.sh"])
+            #R
+	    if options.ssid and options.password:
+                subprocess.check_call(['./prepareClientScan.sh', 'customCredentials'])
+            else:
+                subprocess.call(["./prepareClientScan.sh"])
+            #subprocess.call(["./prepareClientScan.sh", "customCredentials", shell=True]) if options.ssid and options.password else subprocess.call(["./prepareClientScan.sh"])
+            
+            #Create a wireless network and scan devices that connect to to it
             subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"])
             subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
         except KeyboardInterrupt:
