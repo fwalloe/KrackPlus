@@ -545,7 +545,7 @@ class KRAckAttackClient():
 						self.sock_eth.send(request)
 
 	def stop(self):
-		log(STATUS, "Closing hostapd and cleaning up ...")
+		log(STATUS, "Closing hostapd and cleaning up ...", color="green")
 		if self.hostapd:
 			self.hostapd.terminate()
 			self.hostapd.wait()
@@ -613,6 +613,12 @@ if __name__ == "__main__":
 	elif test_tptk_rand:
 		test_tptk = KRAckAttackClient.TPTK_RAND
 
-	attack = KRAckAttackClient()
-	atexit.register(cleanup)
-	attack.run(test_grouphs=test_grouphs, test_tptk=test_tptk)
+        try:
+                attack = KRAckAttackClient()
+        except KeyboardInterrupt:
+	        atexit.register(cleanup)
+
+        try:
+                attack.run(test_grouphs=test_grouphs, test_tptk=test_tptk)
+        except KeyboardInterrupt:
+                atexit.register(cleanup)
