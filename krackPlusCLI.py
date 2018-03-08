@@ -4,6 +4,7 @@ import optparse
 import subprocess
 import atexit
 import logging
+import thread
 LOG_LEVEL = logging.DEBUG
 LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
 from colorlog import ColoredFormatter
@@ -55,6 +56,7 @@ def main():
                 netCredentials.write(options.ssid + '\n' + options.password)
         #Replace default credentials with user-supplied ones in hostapd     
         log.info("Scanning " + options.ssid + " for KRACK vulnerable devices:")
+        thread.start_new_thread(parse, "scanOutput.txt")
         try:
             #Runs if user has specified custom wlan credentials
 	    if options.ssid and options.password:
@@ -62,7 +64,7 @@ def main():
             else:
                 subprocess.call(["./prepareClientScan.sh"])
             #subprocess.call(["./prepareClientScan.sh", "customCredentials", shell=True]) if options.ssid and options.password else subprocess.call(["./prepareClientScan.sh"])
-            
+
             #Create a wireless network and scan devices that connect to to it
 	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], stdout=scanOutput)
