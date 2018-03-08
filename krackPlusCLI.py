@@ -7,6 +7,7 @@ import logging
 LOG_LEVEL = logging.DEBUG
 LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
 from colorlog import ColoredFormatter
+from subprocess import check_output
 logging.root.setLevel(LOG_LEVEL)
 formatter = ColoredFormatter(LOGFORMAT)
 stream = logging.StreamHandler()
@@ -62,8 +63,8 @@ def main():
             #subprocess.call(["./prepareClientScan.sh", "customCredentials", shell=True]) if options.ssid and options.password else subprocess.call(["./prepareClientScan.sh"])
             
             #Create a wireless network and scan devices that connect to to it
-            subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"])
-            subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
+            prosess = subprocess.Popen(["./findVulnerable/krackattack/krack-test-client.py"], stdout=subprocess.PIPE)
+            #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
         except KeyboardInterrupt:
             log.info("Generating PDF with findings ...")
         # if --os-detection:
@@ -72,13 +73,21 @@ def main():
         
     # Running attack scripts
     elif options.attack:
-        print("Performing key reinstallation attack against " + options.attack)
-        #TODO subprocess, run attack script.
+        print("Performing key reinstallation attack")
+        #Sets up dependencies before the attack script runs
+        subprocess.call(["./prepareClientAttack.sh"])
+        #TODO subprocess, run attack script; note that this static implementation is only for testing purposes and should be removed. 	
+        #subprocess.call(["./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa"])
 
     # Must specify an option    
     else:
         log.warn("No option was given, please see usage below and try again!")
         parser.print_help()
+
+
+def parse(krackOutput):
+    print (krackOutput)
+
 
 if __name__ == '__main__':
     main()
