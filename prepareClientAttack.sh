@@ -15,7 +15,7 @@ then
 fi
 
 #Disable network
-nmcli radio wifi off
+sudo airmon-ng check kill
 
 # Disable hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
 ## NOTE we should also make sure that this is reversed when the user is done... Perhaps make it an option
