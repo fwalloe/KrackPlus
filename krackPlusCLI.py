@@ -47,6 +47,7 @@ def main():
     options, args = parser.parse_args()
 
     # Running scan scripts
+    # TODO we have two ifs here. Inner one should not be necessary. 
     if options.scan:
         if options.ssid and options.password:
             #Write the credentials to file, so that they can be used next time the progran runs.
@@ -63,7 +64,10 @@ def main():
             #subprocess.call(["./prepareClientScan.sh", "customCredentials", shell=True]) if options.ssid and options.password else subprocess.call(["./prepareClientScan.sh"])
             
             #Create a wireless network and scan devices that connect to to it
-            prosess = subprocess.Popen(["./findVulnerable/krackattack/krack-test-client.py"], stdout=subprocess.PIPE)
+	    with open('scanOutput.txt', 'w') as scanOutput:
+                subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], stdout=scanOutput)
+	    
+            print >>outputScan, 'whatever'
             #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
         except KeyboardInterrupt:
             log.info("Generating PDF with findings ...")
@@ -86,10 +90,10 @@ def main():
 
 
 def parse(krackOutput):
+    print "Heloooo"
     print (krackOutput)
 
 
 if __name__ == '__main__':
     main()
-
 
