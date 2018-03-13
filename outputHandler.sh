@@ -19,13 +19,13 @@ IFS=$'\n'
 
 # $1 is the output-string and $2 is the line number
 writePDF() {
-sed -i "$2s/.*/$1/" $reportPath$reportName
+    sed -i "$2s/.*/$1/" $reportPath$reportName
 }
 
 # Performs an nMap scan on a given IP-adress
 nmapScan() {
-scanOutput=$(nmap -O $1 | grep 'OS details' 2> /dev/null)
-echo $scanOutput
+    scanOutput=$(nmap -O $1 | grep 'OS details' 2> /dev/null)
+    echo $scanOutput
 }
 
 echo "Report"
@@ -51,6 +51,7 @@ for line in $macAndIP; do
         mac="$mac$addMac\n"
         IP="$IP$addIP\n"
         macIP="$macIP$addMac $addIP\n"
+        echo "device with mac-address $addMac connected"
     fi
 done
 
@@ -65,6 +66,7 @@ if [[ $(echo $pairwiseVuln | wc -l) -gt 0 ]]; then
     #Extract the mac-addresses from the output
     for line in $pairwiseVuln; do
        vulnMac="$vulnMac$(echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null))\n"
+       echo "Found mac-address vulnerable to pairwise key reinstallation:"
        echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null
     done
 
@@ -79,26 +81,24 @@ if [[ $(echo $groupVuln | wc -l) -gt 0 ]]; then
     #Extract the mac-addresses from the output
     for line in $groupVuln; do
         vulnMac="$vulnMac$(echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null)\n"
+        echo "Found mac-address vulnerable to pairwise key reinstallation:"
         printf $line 2> /dev/null | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null
     done
     else
     echo "No clients vulnerable to group key reinstallations in the 4-way handshake"
 fi
 
-#echo ""
-
 #Discard duplicate results
 vulnMac="$(printf $vulnMac 2> /dev/null | uniq)"
 
 #Find the IP-addresses belonging to the mac-addresses
-#echo "IP-address of vulnerable mac-addresses:"
 for line in $vulnMac ; do
    if [[ "$macIP" == *"$line"* ]] ; then
-        vulnIP="$(printf "$macIP" 2> /dev/null | grep -s $line | grep -s -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}')" 2> /dev/null
-        printf "$macIP" 2> /dev/null | grep $line 2> /dev/null | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}' 2> /dev/null
+        vulnIP="$(printf "$macIP" 2> /dev/null | grep $line | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}')" 2> /dev/null
+        printf "Vulnerable device:\nIP-address $vulnIP with mac-address $line\n"
         if [[ $2 == "NMAP" ]]; then
             nmapOutput="$nmapOutput$vulnIP: $(nmapScan "$vulnIP")\n"
-            printf $nmapOutput 2> /dev/null
+            echo $($nmapOutput 2> /dev/null)
         fi
    fi
 done
