@@ -85,7 +85,7 @@ if [[ $(echo $groupVuln | wc -l) -gt 0 ]]; then
     echo "No clients vulnerable to group key reinstallations in the 4-way handshake"
 fi
 
-echo ""
+#echo ""
 
 #Discard duplicate results
 vulnMac="$(printf $vulnMac 2> /dev/null | uniq)"
