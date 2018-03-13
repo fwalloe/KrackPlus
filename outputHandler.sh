@@ -5,10 +5,12 @@ fileContent=""
 newFileContent=""
 diff=""
 macIP=""
-addMac=""
-addIP=""
+addedMac=""
+addedIP=""
 vulnMac=""
 vulnIP=""
+notVulnMac=""
+notVulnIP=""
 nmapOutput=""
 
 reportName='reportTemplate.tex'
@@ -42,14 +44,14 @@ macAndIP=$(printf "$diff" 2> /dev/null | grep "DHCP reply" 2> /dev/null | uniq)
 
 # Adding mac and IP-address of connected clients
 for line in $macAndIP; do
-    addMac="$(printf $line 2> /dev/null | cut -b 25- | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null | uniq)"
-    addIP="$(printf $line 2> /dev/null | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}' | uniq 2> /dev/null)"
+    addedMac="$(printf $line 2> /dev/null | cut -b 25- | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null | uniq)"
+    addedIP="$(printf $line 2> /dev/null | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}' | uniq 2> /dev/null)"
     # Add mac and IP (if there is any)
-    if [[ $(echo $addMac | wc -c) -gt 5 && $(echo $addIP | wc -c) -gt 5 ]]; then
-        mac="$mac$addMac\n"
-        IP="$IP$addIP\n"
-        macIP="$macIP$addMac $addIP\n"
-        printf "device with mac-address $addMac connected\n\n"
+    if [[ $(echo $addedMac | wc -c) -gt 5 && $(echo $addedIP | wc -c) -gt 5 ]]; then
+        mac="$mac$addedMac\n"
+        IP="$IP$addedIP\n"
+        macIP="$macIP$addedMac $addedIP\n"
+        printf "device with mac-address $addedMac connected\n\n"
     fi
 done
 
@@ -82,17 +84,35 @@ if [[ $(echo $groupVuln | wc -l) -gt 0 ]]; then
             printf $line 2> /dev/null | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null
             printf "\n"
     done
-else
-    echo "No clients vulnerable to group key reinstallations in the 4-way handshake"
 fi
 
 #Discard duplicate results
-vulnMac="$(printf $vulnMac 2> /dev/null | uniq)"
+vulnMac=$(printf $vulnMac 2> /dev/null | uniq)
+
+notPairwiseVuln=$(printf "$diff" 2> /dev/null | grep "client DOESN'T seem vulnerable to pairwise" 2> /dev/null | uniq)
+
+if [[ $(echo $notPairwiseVuln | wc -l) -gt 0 ]] ; then
+    for line in $notPairwiseVuln; do
+        notVulnMac="$notVulnMac$(echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null)\n"
+
+        printf "Client $(printf $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null) does not seem vulnerable to pairwise 4-way handshake\n\n"
+        done
+    fi
+
+notGroupVuln=$(printf "$diff" 2> /dev/null | grep "client DOESN'T seem vulnerable to group" 2> /dev/null | uniq)
+
+if [[ $(echo $notGroupVuln | wc -l) -gt 0 ]] ; then
+    for line in $notGroupVuln; do
+        notVulnMac="$notVulnMac$(echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null)\n"
+
+        printf "Client $(printf $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null) does not seem vulnerable to group key handshake\n\n"
+        done
+fi
 
 #Find the IP-addresses belonging to the mac-addresses
 for line in $vulnMac ; do
    if [[ "$macIP" == *"$line"* ]] ; then
-        vulnIP="$(printf "$macIP" 2> /dev/null | grep $line | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}')" 2> /dev/null
+        vulnIP="$(printf $macIP 2> /dev/null | grep $line | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}')" 2> /dev/null
         printf "Vulnerable device:\nIP-address $vulnIP with mac-address $line\n\n"
         # Perform nmap scan if desired by the user
         if [[ $2 == "NMAP" ]]; then
