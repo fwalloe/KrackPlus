@@ -3,18 +3,6 @@
 # Install dependencies
 echo "Setting up dependencies..."
 
-
-# Make modified hostapd instance. Only needs to be done once
-if [[ ! -x "./krackattacks-poc-zerokey/hostapd/hostapd" ]] 
-then 
-	echo "Compiling hostapd"
-	cd ./krackattacks-poc-zerokey/hostapd/
-	cp defconfig .config 
-	make -j 2 > /dev/null
-	cd ../../
-fi
-
-
 # Set interface variables:
 eth0=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==1' | tr -d ':')
 
@@ -32,6 +20,19 @@ sed -i "5s/.*/INTERNET=$(sed '5q;d' $eth0)/" ./krackattacks-poc-zerokey/krackatt
 
 sed -i "7s/.*/INTERNET=$(sed '7q;d' $wlan1)/" ./krackattacks-poc-zerokey/krackattack/enable_internet_forwarding.sh
 
+# Make modified hostapd instance. Only needs to be done once
+if [[ ! -x "./krackattacks-poc-zerokey/hostapd/hostapd" ]] 
+then 
+	echo "Compiling hostapd"
+	cd ./krackattacks-poc-zerokey/hostapd/
+	cp defconfig .config 
+	make -j 2 > /dev/null
+	cd ../../
+fi
+
+
+#TODO
+echo "About to kill and then scan"
 
 #Disable network
 sudo airmon-ng check kill
