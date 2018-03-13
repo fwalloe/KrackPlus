@@ -4,41 +4,49 @@ input=$1
 fileContent=""
 newFileContent=""
 diff=""
+macIP=""
+addMac=""
+addIP=""
 
 reportName='reportTemplate.tex'
 reportPath='./'
 
 #Make newline the only separator in the loop
-#IFS=$'\n'
+IFS=$'\n'
 
 # $1 is the output-string and $2 is the line number
 writePDF() {
 sed -i "$2s/.*/$1/" $reportPath$reportName
 }
 
+nmapScan() {
+scanOutput=$(nmap -O $1 | grep 'OS details')
+echo $scanOutput
+}
+
 # $1 is the new file content
 checkOutput() {
 
-#Make newline the only separator in the loop
+#Make newline the only separator in this subshell
 IFS=$'\n'
 
 output="$1"
 
 #Unique elements only
 macAndIP=$(printf "$output" | grep "DHCP reply" | uniq)
-printf "MAcANDIP: $macAndIP"
-#printf "file::: $output"
 
 for line in $macAndIP; do
-    addMac=$(echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}')
-    addIP=$(echo $line | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}')
-
-    mac="$mac$addMac\n"
-    IP="$IP$addIP\n"
-
-    macIP="$macIP$addMac $addIP\n"
-    macIP=$(printf $macIP | uniq)
+    addMac="$(printf $line | cut -b 25- | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' | uniq)"
+    addIP="$(printf $line | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}' | uniq)"
+    if [[ $(echo $addMac | wc -c) -gt 5 && $(echo $addIP | wc -c) -gt 5 ]]; then
+        mac="$mac$addMac\n"
+        IP="$IP$addIP\n"
+        macIP="$macIP$addMac $addIP\n"
+    fi
 done
+
+#Discard recurring results
+macIP="$(echo $macIP | uniq)"
 
 #The mac-addresses vulnerable against pairwise key reinst.
 pairwiseVuln=$(printf "$output" | grep "Client is vulnerable to pairwise" | uniq)
@@ -75,15 +83,16 @@ fi
 echo ""
 
 #Discard duplicate results
-#vulnMac=$(printf $vulnMac | uniq)
+vulnMac="$(printf $vulnMac | uniq)"
 
 #Find the IP-addresses belonging to the mac-addresses
 
 echo "IP-address of vulnerable mac-addresses:"
-echo "MACIP: $macIP end"
 for line in $vulnMac ; do
    if [[ "$macIP" == *"$line"* ]] ; then
-        printf $macIP | grep $line | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}'
+        vulnIP=$(printf "$macIP" | grep $line | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}')
+        printf "$vulnIP"
+        nmapScan "$vulnIP"
    fi
 done
 
@@ -93,8 +102,9 @@ echo "Report"
 echo " "
 
 
-newFileContent=$(cat "$input")
+newFileContent=$(cat $input)
 diff=$(printf "$newFileContent" | grep -v "$fileContent")
 fileContent="$newFileContent"
+#checkOutput "$diff"
 
 checkOutput "$newFileContent"

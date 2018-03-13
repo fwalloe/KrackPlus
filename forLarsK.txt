@@ -134,6 +134,7 @@ wlan0: AP-STA-DISCONNECTED 54:27:58:63:14:aa
 [11:42:34] [0;32m54:27:58:63:14:aa: IV reuse detected (IV=1, seq=2). Client is vulnerable to pairwise key reinstallations in the 4-way handshake!
 [11:42:36] [0;32m54:27:58:63:14:aa: DHCP reply 192.168.100.2 to 54:27:58:63:14:aa
 [11:42:36] [0;32m54:27:58:63:14:aa: DHCP reply 192.168.100.1 to 54:27:58:63:14:ab
+[11:42:36] [0;32m54:27:58:63:14:aa: DHCP reply 192.168.8.101 to 54:27:58:63:14:ac
 [11:42:36] 54:27:58:63:14:aa: client has IP address -> testing for group key reinstallation in the 4-way handshake[1;0m
 [11:42:36] 54:27:58:63:14:aa: sending broadcast ARP to 192.168.100.2 from 192.168.100.1[1;0m
 [11:42:38] 54:27:58:63:14:aa: sending broadcast ARP to 192.168.100.2 from 192.168.100.1[1;0m
@@ -143,6 +144,7 @@ wlan0: AP-STA-DISCONNECTED 54:27:58:63:14:aa
 [11:42:46] 54:27:58:63:14:aa: sending broadcast ARP to 192.168.100.2 from 192.168.100.1[1;0m
 [11:42:48] 54:27:58:63:14:aa: sending broadcast ARP to 192.168.100.2 from 192.168.100.1[1;0m
 [11:42:48] [0;32m54:27:58:63:14:aa: Received 5 unique replies to replayed broadcast ARP requests. Client is vulnerable to group
+[11:42:48] [0;32m54:27:58:63:14:ac: Received 5 unique replies to replayed broadcast ARP requests. Client is vulnerable to group
 [11:42:48] [0;32m                   key reinstallations in the 4-way handshake (or client accepts replayed broadcast frames)!
 Scanning can:
 wlan0: AP-DISABLED 
