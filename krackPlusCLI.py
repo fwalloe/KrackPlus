@@ -55,22 +55,24 @@ def main():
             with open('networkCredentials.txt', 'w') as netCredentials:
                 netCredentials.write(options.ssid + '\n' + options.password)
         #Replace default credentials with user-supplied ones in hostapd     
-        log.info("Scanning " + options.ssid + " for KRACK vulnerable devices:")
-        thread.start_new_thread(parse, "scanOutput.txt")
+        log.warning("Connect to " + options.ssid + " with " + options.password + " to scan devices")
+	# TODO what is this?
+        #thread.start_new_thread(parse, "scanOutput.txt")
         try:
             #Runs if user has specified custom wlan credentials
 	    if options.ssid and options.password:
                 subprocess.check_call(['./prepareClientScan.sh', 'customCredentials'])
             else:
                 subprocess.call(["./prepareClientScan.sh"])
-            #subprocess.call(["./prepareClientScan.sh", "customCredentials", shell=True]) if options.ssid and options.password else subprocess.call(["./prepareClientScan.sh"])
-
+         
             #Create a wireless network and scan devices that connect to to it
 	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], stdout=scanOutput)
             #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
         except KeyboardInterrupt:
             log.info("Generating PDF with findings ...")
+            log.info("Restoring internet connection ...")
+            subprocess.call(["./restoreClientWifi.sh"])
         # if --os-detection:
         if options.os:
             print "NMAP"
