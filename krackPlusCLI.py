@@ -56,7 +56,8 @@ def main():
                 netCredentials.write(options.ssid + '\n' + options.password)
         #Replace default credentials with user-supplied ones in hostapd     
         log.info("Scanning " + options.ssid + " for KRACK vulnerable devices:")
-        thread.start_new_thread(parse, "scanOutput.txt")
+	# TODO what is this?
+        #thread.start_new_thread(parse, "scanOutput.txt")
         try:
             #Runs if user has specified custom wlan credentials
 	    if options.ssid and options.password:
@@ -71,6 +72,8 @@ def main():
             #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
         except KeyboardInterrupt:
             log.info("Generating PDF with findings ...")
+            log.info("Restoring internet connection ...")
+            subprocess.call(["./restoreClientWifi.sh"])
         # if --os-detection:
         if options.os:
             print "NMAP"
