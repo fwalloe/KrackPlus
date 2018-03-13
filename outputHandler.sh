@@ -61,7 +61,7 @@ macIP="$(echo $macIP | uniq)"
 pairwiseVuln=$(printf "$diff" 2> /dev/null | grep "Client is vulnerable to pairwise" 2> /dev/null | uniq)
 
 if [[ $(echo $pairwiseVuln | wc -l) -gt 0 ]]; then
-    echo "Clients vulnerable to pairwise key reinstallations in the 4-way handshake:"
+    #echo "Clients vulnerable to pairwise key reinstallations in the 4-way handshake:"
     #Extract the mac-addresses from the output
     for line in $pairwiseVuln; do
        vulnMac="$vulnMac$(echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null))\n"
@@ -75,7 +75,7 @@ fi
 #The mac-addresses vulnerable against group key reinst.
 groupVuln=$(printf "$diff" 2> /dev/null | grep "Client is vulnerable to group" 2> /dev/null | uniq)
 if [[ $(echo $groupVuln | wc -l) -gt 0 ]]; then
-    echo "Clients vulnerable to group key reinstallations in the 4-way handshake:"
+    #echo "Clients vulnerable to group key reinstallations in the 4-way handshake:"
     #Extract the mac-addresses from the output
     for line in $groupVuln; do
         vulnMac="$vulnMac$(echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null)\n"
@@ -91,7 +91,7 @@ echo ""
 vulnMac="$(printf $vulnMac 2> /dev/null | uniq)"
 
 #Find the IP-addresses belonging to the mac-addresses
-echo "IP-address of vulnerable mac-addresses:"
+#echo "IP-address of vulnerable mac-addresses:"
 for line in $vulnMac ; do
    if [[ "$macIP" == *"$line"* ]] ; then
         vulnIP="$(printf "$macIP" 2> /dev/null | grep -s $line | grep -s -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}')" 2> /dev/null
