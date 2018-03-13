@@ -68,8 +68,6 @@ def main():
             #Create a wireless network and scan devices that connect to to it
 	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], stdout=scanOutput)
-	    
-            print >>outputScan, 'whatever'
             #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
         except KeyboardInterrupt:
             log.info("Generating PDF with findings ...")
@@ -89,12 +87,6 @@ def main():
     else:
         log.warn("No option was given, please see usage below and try again!")
         parser.print_help()
-
-
-def parse(krackOutput):
-    print "Heloooo"
-    subprocess.call("./outputHandler " + krackOutput)
-
 
 if __name__ == '__main__':
     main()
