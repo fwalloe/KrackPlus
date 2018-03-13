@@ -19,6 +19,11 @@ writePDF() {
 sed -i "$2s/.*/$1/" $reportPath$reportName
 }
 
+nmapScan() {
+scanOutput=$(nmap -O $1 | grep 'OS details')
+echo $scanOutput
+}
+
 # $1 is the new file content
 checkOutput() {
 
@@ -85,7 +90,9 @@ vulnMac="$(printf $vulnMac | uniq)"
 echo "IP-address of vulnerable mac-addresses:"
 for line in $vulnMac ; do
    if [[ "$macIP" == *"$line"* ]] ; then
-        printf "$macIP" | grep $line | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}'
+        vulnIP=$(printf "$macIP" | grep $line | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}')
+        printf "$vulnIP"
+        nmapScan "$vulnIP"
    fi
 done
 
