@@ -28,14 +28,10 @@ nmapScan() {
     echo $scanOutput
 }
 
-echo "Report"
-echo ""
-
 while true; do
 
 newFileContent=$(cat $input 2> /dev/null)
 diff="$(diff <(echo "$newFileContent") <(echo "$fileContent"))"
-#diff=$(printf "$newFileContent" 2> /dev/null | grep -v "$fileContent" 2> /dev/null)
 fileContent="$newFileContent"
 
 #Make newline the only separator in this subshell
@@ -44,14 +40,16 @@ IFS=$'\n'
 #Unique elements only
 macAndIP=$(printf "$diff" 2> /dev/null | grep "DHCP reply" 2> /dev/null | uniq)
 
+# Adding mac and IP-address of connected clients
 for line in $macAndIP; do
     addMac="$(printf $line 2> /dev/null | cut -b 25- | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null | uniq)"
     addIP="$(printf $line 2> /dev/null | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}' | uniq 2> /dev/null)"
+    # Add mac and IP (if there is any)
     if [[ $(echo $addMac | wc -c) -gt 5 && $(echo $addIP | wc -c) -gt 5 ]]; then
         mac="$mac$addMac\n"
         IP="$IP$addIP\n"
         macIP="$macIP$addMac $addIP\n"
-        echo "device with mac-address $addMac connected"
+        printf "device with mac-address $addMac connected\n\n"
     fi
 done
 
@@ -62,12 +60,12 @@ macIP="$(echo $macIP | uniq)"
 pairwiseVuln=$(printf "$diff" 2> /dev/null | grep "Client is vulnerable to pairwise" 2> /dev/null | uniq)
 
 if [[ $(echo $pairwiseVuln | wc -l) -gt 0 ]]; then
-    #echo "Clients vulnerable to pairwise key reinstallations in the 4-way handshake:"
     #Extract the mac-addresses from the output
     for line in $pairwiseVuln; do
        vulnMac="$vulnMac$(echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null))\n"
        echo "Found mac-address vulnerable to pairwise key reinstallation:"
        echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null
+       printf "\n"
     done
 
     else
@@ -77,14 +75,14 @@ fi
 #The mac-addresses vulnerable against group key reinst.
 groupVuln=$(printf "$diff" 2> /dev/null | grep "Client is vulnerable to group" 2> /dev/null | uniq)
 if [[ $(echo $groupVuln | wc -l) -gt 0 ]]; then
-    #echo "Clients vulnerable to group key reinstallations in the 4-way handshake:"
     #Extract the mac-addresses from the output
     for line in $groupVuln; do
         vulnMac="$vulnMac$(echo $line | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null)\n"
-        echo "Found mac-address vulnerable to pairwise key reinstallation:"
-        printf $line 2> /dev/null | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null
+            echo "Found mac-address vulnerable to group key reinstallation:"
+            printf $line 2> /dev/null | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' 2> /dev/null
+            printf "\n"
     done
-    else
+else
     echo "No clients vulnerable to group key reinstallations in the 4-way handshake"
 fi
 
@@ -95,10 +93,12 @@ vulnMac="$(printf $vulnMac 2> /dev/null | uniq)"
 for line in $vulnMac ; do
    if [[ "$macIP" == *"$line"* ]] ; then
         vulnIP="$(printf "$macIP" 2> /dev/null | grep $line | grep -Eo '*([0-9]{1,3}\.){3}[0-9]{1,3}')" 2> /dev/null
-        printf "Vulnerable device:\nIP-address $vulnIP with mac-address $line\n"
+        printf "Vulnerable device:\nIP-address $vulnIP with mac-address $line\n\n"
+        # Perform nmap scan if desired by the user
         if [[ $2 == "NMAP" ]]; then
-            nmapOutput="$nmapOutput$vulnIP: $(nmapScan "$vulnIP")\n"
-            echo $($nmapOutput 2> /dev/null)
+            nmap="$vulnIP: $(nmapScan "$vulnIP" 2> /dev/null)\n"
+            nmapOutput="$nmapOutput$nmap"
+            printf "$nmap\n\n"
         fi
    fi
 done
