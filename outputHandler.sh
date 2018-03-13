@@ -33,7 +33,7 @@ echo ""
 
 while true; do
 
-newFileContent=$(cat $input)
+newFileContent=$(cat $input 2> /dev/null)
 diff="$(diff <(echo "$newFileContent") <(echo "$fileContent"))"
 #diff=$(printf "$newFileContent" 2> /dev/null | grep -v "$fileContent" 2> /dev/null)
 fileContent="$newFileContent"
