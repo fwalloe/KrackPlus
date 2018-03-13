@@ -40,10 +40,8 @@ fileContent="$newFileContent"
 #Make newline the only separator in this subshell
 IFS=$'\n'
 
-output="$fileContent"
-
 #Unique elements only
-macAndIP=$(printf "$output" | grep "DHCP reply" | uniq)
+macAndIP=$(printf "$diff" | grep "DHCP reply" | uniq)
 
 for line in $macAndIP; do
     addMac="$(printf $line | cut -b 25- | grep -Eo '*([0-9a-f]{2}\:){5}[0-9a-f]{2}' | uniq)"
@@ -59,7 +57,7 @@ done
 macIP="$(echo $macIP | uniq)"
 
 #The mac-addresses vulnerable against pairwise key reinst.
-pairwiseVuln=$(printf "$output" | grep "Client is vulnerable to pairwise" | uniq)
+pairwiseVuln=$(printf "$diff" | grep "Client is vulnerable to pairwise" | uniq)
 
 if [[ $(echo $pairwiseVuln | wc -l) -gt 0 ]]; then
     echo "Clients vulnerable to pairwise key reinstallations in the 4-way handshake:"
@@ -75,7 +73,7 @@ if [[ $(echo $pairwiseVuln | wc -l) -gt 0 ]]; then
 fi
 
 #The mac-addresses vulnerable against group key reinst.
-groupVuln=$(printf "$output" | grep "Client is vulnerable to group" | uniq)
+groupVuln=$(printf "$diff" | grep "Client is vulnerable to group" | uniq)
 if [[ $(echo $groupVuln | wc -l) -gt 0 ]]; then
     echo "Clients vulnerable to group key reinstallations in the 4-way handshake:"
     #Extract the mac-addresses from the output
