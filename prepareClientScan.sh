@@ -18,12 +18,12 @@ while read packages; do
 done <dependenciesClientScan
 
 # Make modified hostapd instance. Only needs to be done once. 
-if [[ ! -x "./findVulnerable/hostapd/" ]] 
+if [[ ! -x "./findVulnerable/hostapd/hostapd" ]] 
 then 
 	echo "Compiling hostapd"
 	cd ./findVulnerable/hostapd/
 	cp defconfig .config 
-	make -j 2 > /dev/null
+	make -j 2 1>/dev/null
 	cd ../../
 fi
 
@@ -35,7 +35,7 @@ nmcli radio wifi off
 ./findVulnerable/krackattack/disable-hwcrypto.sh
 
 # Replace default password if user requests it
-if [ $1 == "customCredentials" ]
+if [ "$1" == "customCredentials" ]
 then
 	sed -i "88s/.*/ssid=$(sed '1q;d' networkCredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
 	sed -i "1146s/.*/wpa_passphrase=$(sed '2q;d' networkCredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf

@@ -7,7 +7,19 @@
 # See README for more details.
 
 import logging
-logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from colorlog import ColoredFormatter
+from subprocess import check_output
+LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
+logging.root.setLevel(logging.DEBUG)
+formatter = ColoredFormatter()
+stream = logging.StreamHandler()
+stream.setLevel(logging.DEBUG)
+stream.setFormatter(formatter)
+log = logging.getLogger('pythonConfig')
+log.setLevel(logging.DEBUG)
+log.addHandler(stream)
+
+
 from scapy.all import *
 from libwifi import *
 import sys, socket, struct, time, subprocess, atexit, select, os.path
@@ -451,7 +463,7 @@ class KRAckAttackClient():
 		self.process_eth_rx(p)
 
 	def configure_interfaces(self):
-		#log(STATUS, "Note: disable Wi-Fi in network manager & disable hardware encryption. Both may interfere with this script.")
+		log(STATUS, "Note: disable Wi-Fi in network manager & disable hardware encryption. Both may interfere with this script.")
 
 		# 0. Some users may forget this otherwise
 		subprocess.check_output(["rfkill", "unblock", "wifi"])
@@ -521,8 +533,7 @@ class KRAckAttackClient():
 		elif self.test_tptk == KRAckAttackClient.TPTK_RAND:
 			hostapd_command(self.hostapd_ctrl, "TEST_TPTK_RAND")
 
-                log(STATUS, "Make sure the client requests an IP using DHCP!", color="orange")
-		log(STATUS, "Ready. Connect to this Access Point/Wi-Fi to start the tests.", color="green")
+		log(STATUS, "Ready. Connect to this Access Point to start the tests. Make sure the client requests an IP using DHCP!", color="green")
 
 		# Monitor both the normal interface and virtual monitor interface of the AP
 		self.next_arp = time.time() + 1
@@ -545,13 +556,13 @@ class KRAckAttackClient():
 						self.sock_eth.send(request)
 
 	def stop(self):
-		log(STATUS, "Closing hostapd and cleaning up ...", color="green")
+		log(STATUS, "Closing hostapd and cleaning up ...")
 		if self.hostapd:
 			self.hostapd.terminate()
 			self.hostapd.wait()
 		if self.sock_mon: self.sock_mon.close()
 		if self.sock_eth: self.sock_eth.close()
-                subprocess.call('nmcli radio wifi on', shell=True)
+
 
 def cleanup():
 	attack.stop()
@@ -613,12 +624,6 @@ if __name__ == "__main__":
 	elif test_tptk_rand:
 		test_tptk = KRAckAttackClient.TPTK_RAND
 
-        try:
-                attack = KRAckAttackClient()
-        except KeyboardInterrupt:
-	        atexit.register(cleanup)
-
-        try:
-                attack.run(test_grouphs=test_grouphs, test_tptk=test_tptk)
-        except KeyboardInterrupt:
-                atexit.register(cleanup)
+	attack = KRAckAttackClient()
+	atexit.register(cleanup)
+	attack.run(test_grouphs=test_grouphs, test_tptk=test_tptk)
