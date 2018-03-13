@@ -31,7 +31,7 @@ nmapScan() {
 while true; do
 
 newFileContent=$(cat $input 2> /dev/null)
-diff="$(diff <(echo "$newFileContent") <(echo "$fileContent"))"
+diff=$(diff <(echo "$newFileContent") <(echo "$fileContent"))
 fileContent="$newFileContent"
 
 #Make newline the only separator in this subshell
