@@ -5,6 +5,7 @@
 import subprocess
 import re
 
+
 # Get the hashmaps with MAC- and IP-addresses
 # of scanned and vulnerable addresses
 # from the scan output parser
@@ -15,8 +16,8 @@ import re
 # Test block
 # Should bo commented when functional. Uncomment the import above.
 
-ip = '192.168.1.0'
-mac = '1111:aaaa:dddd:2222'
+ip = ' '
+mac = ' '
 pairMacIP = {mac:ip}
 pairwiseVulnMacIP = {mac:ip}
 groupVulnMacIP = {mac:ip}
@@ -44,64 +45,101 @@ def addData():
     mac = '6666.aaaa.1111.2222'
     pairMacIP.update({mac:ip})
 
-
-addData()
-
 # End test block
-
-# Write a bachslash
-
-def backslash():
-    return re.escape('\\')
 
 # Write a newline
 def newline():
-    return backslash() + 'newline'
+    return '\\newline'
 
+def getParserData():
+    counter = 1
+
+    with open('./scannedMacIP.txt', 'r') as MACIP:
+        for line in MACIP:
+            if (line != ' '):
+                if (counter % 2 == 1):
+                    mac = line
+                else:
+                    ip = line
+                    pairMacIP.update({mac:ip})
+                counter += 1
+    MACIP.closed
+
+    counter = 1
+
+    with open('./pairwiseVulnMacIP.txt', 'r') as MACIP:
+        for line in MACIP:
+            if (line != ' '):
+                if (counter % 2 == 1):
+                    mac = line
+                else:
+                    ip = line
+                    pairwiseVulnMacIP.update({mac:ip})
+                counter += 1
+    MACIP.closed
+
+    counter = 1
+
+    with open('./groupVulnMacIP.txt', 'r') as MACIP:
+        for line in MACIP:
+            if (line != ' '):
+                if (counter % 2 == 1):
+                    mac = line
+                else:
+                    ip = line
+                    groupVulnMacIP.update({mac:ip})
+                counter += 1
+    MACIP.closed
 
 # Writes a line of text on a given line
 # "lineNumber" is the line number on which this text will be written
 # "str" is the string to be written on this line
-def writeValue(lineNumber , string):
-    subprocess.call("sed -i '" + str(lineNumber) + "s/.*/" + string + newline() + "/'" + " ./reportTemplate.tex", shell=True)
-    return lineNumber + 1
+def writeValue(report, string):
+    #subprocess.call("sed -i '" + str(lineNumber) + "s/.*/" + string + newline() + "/'" + " ./reportTemplate.tex", shell=True)
+    report.write(string + newline() + '\n')
 
 
 # Writes the individual scanned device and the corresponding data
 # "startLine" is the first line of the device's data
 # "str" is the mac-address of the device
 # "count" is just a number used to index them in the report
-def writeElement(startLine , mac, count):
-    line = startLine
-    line = writeValue(line, 'Device nr. ' + str(count))
-    line = writeValue(line, 'Mac: ' + mac)
-    line = writeValue(line, 'IP: ' + pairMacIP.get(mac))
-    line = writeValue(line, '')
+def writeElement(report, mac, count):
+    writeValue(report, 'Device nr. ' + str(count))
+    writeValue(report, 'Mac: ' + mac)
+    writeValue(report, 'IP: ' + pairMacIP.get(mac))
+    writeValue(report, '')
     if pairwiseVulnMacIP.get(mac) is not None and groupVulnMacIP.get(mac) is not None:
-        line = writeValue(line, 'Not vulnerable')
+        writeValue(report, 'Not vulnerable')
     elif pairwiseVulnMacIP.get(mac) is not None or groupVulnMacIP.get(mac) is not None:
-        line = writeValue(line, 'Vulnerable to')
+        writeValue(report, 'Vulnerable to')
         if (pairwiseVulnMacIP.get(mac)) is not None:
-            line = writeValue(line, 'Pairwise Key Reinstallation Attacks')
+            writeValue(report, 'Pairwise Key Reinstallation Attacks')
         if (groupVulnMacIP.get(mac)) is not None:
-            line = writeValue(line, 'Group Key Reinstallation Attacks')
+            writeValue(report, 'Group Key Reinstallation Attacks')
 
-    line = writeValue(line, '')
-    line = writeValue(line, '')
-
-    return line
+    writeValue(report, '')
+    writeValue(report, '')
 
 
 # Writes about all the scanned devices
 # "startLine" is the line number to begin the writing
-def writeDocument(startLine):
-    count = 1
-    for mac in pairMacIP.iterkeys():
-        if (mac != ' '):
-            startLine = writeElement(startLine, mac, count)
-            count += 1
+def writeDocument():
+    with open('./reportTemplate.tex', 'w') as report:
+        with open('./texCode.txt', 'r') as initTexcode:
+            texCode = initTexcode.read()
+            report.write(texCode)
+        initTexcode.closed
+
+        count = 1
+        for mac in pairMacIP.iterkeys():
+            if (mac != ' '):
+                writeElement(report, mac, count)
+                count += 1
+        report.write('\end{document}')
+    report.closed
 
 
+#addData()
+getParserData()
 # Write the mac-addresses to file
-lineNr = 51
-writeDocument(lineNr)
+writeDocument()
