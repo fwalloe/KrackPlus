@@ -23,14 +23,14 @@ wlan0=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==3' | tr -d ':')
 wlan1=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==4' | tr -d ':')
 
 # Replace hard-coded interface value in dnsmasq.conf
-#sed -i "1s/.*/interface=$(sed '2q;d' $wlan1)/" ./krackattacks-poc-zerokey/krackattack/dnsmasq.conf
+sed -i "1s/.*/interface=$(sed '2q;d' $wlan1)/" ./krackattacks-poc-zerokey/krackattack/dnsmasq.conf
 
 # Replace hard-coded interface values in enable_internet_forwarding.sh
 
 #TODO should test whether we can use wlan1 0 to forward traffic, of it it's busy monitoring.
-#sed -i "5s/.*/INTERNET=$(sed '5q;d' $eth0)/" ./krackattacks-poc-zerokey/krackattack/enable_internet.sh
+sed -i "5s/.*/INTERNET=$(sed '5q;d' $eth0)/" ./krackattacks-poc-zerokey/krackattack/enable_internet_forwarding.sh
 
-#sed -i "7s/.*/INTERNET=$(sed '7q;d' $wlan1)/" ./krackattacks-poc-zerokey/krackattack/enable_internet.sh
+sed -i "7s/.*/INTERNET=$(sed '7q;d' $wlan1)/" ./krackattacks-poc-zerokey/krackattack/enable_internet_forwarding.sh
 
 
 #Disable network
