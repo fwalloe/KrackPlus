@@ -78,7 +78,7 @@ def writeDictionary(dictionary, file):
         for key, value in dictionary.iteritems():
             if key != '' and value != '':
                 MacIP.write(key + '\n')
-                MacIP.write(value, '\n')
+                MacIP.write(value + '\n')
 
     MacIP.closed
 
