@@ -71,6 +71,7 @@ def main():
             log.info("Generating PDF with findings ...")
             log.info("Restoring internet connection ...")
             subprocess.call(["./restoreClientWifi.sh"])
+	    sys.exit(0)
         # if --os-detection:
         if options.os:
             print "NMAP"
