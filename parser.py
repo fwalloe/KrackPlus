@@ -15,7 +15,10 @@ with open('./scanOutput.txt', 'r') as output:
         i = 0
 	mac = ''
 	ip = ''
-        pairMacIP = {mac:ip}
+    	pairMacIP = {mac:ip}
+	pairwiseVulnMacIP = {mac:ip}
+	groupVulnMacIP = {mac:ip}
+	notVuln = {mac:ip}
 	# goes through the file line by line
         while True:
                 time.sleep(1)
@@ -42,8 +45,10 @@ with open('./scanOutput.txt', 'r') as output:
 			        else:
 				        if str("group") in line:
 					        print (mac+" is vulnerable to group key reinstallation")
+						groupVulnMacIP.update({mac:ip})
 				        else:
-					        print (mac+" is vulnerable to pairwise")  
+					        print (mac+" is vulnerable to pairwise")
+						pairwiseVulnMacIP.update({mac:ip})
 # Prints everything in the hashmap (must be expanded if we make it a hashmap with four values
 print "Connected devices:"
 for key, value in pairMacIP.iteritems():
