@@ -4,9 +4,9 @@
 
 nmcli radio wifi on
 
-wlanName=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==3' | tr -d ':')
-
 systemctl start NetworkManager
+
+wlanName=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==3' | tr -d ':')
 
 ifconfig $wlanName down
 iwconfig $wlanName mode managed
