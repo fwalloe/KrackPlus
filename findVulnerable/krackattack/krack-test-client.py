@@ -225,8 +225,8 @@ class ClientState():
 			if self.vuln_4way != ClientState.VULNERABLE:
 				iv = dot11_get_iv(p)
 				seq = dot11_get_seqnum(p)
-				log(INFO, ("%s: IV reuse detected (IV=%d, seq=%d). " +
-					"Client is vulnerable to pairwise key reinstallations in the 4-way handshake!") % (self.mac, iv, seq), color="green")
+				print ("IV reuse detected (IV=%d, seq=%d). " +
+					"Client " + self.mac + " is vulnerable to pairwise key reinstallations in the 4-way handshake!")
 			self.vuln_4way = ClientState.VULNERABLE
 
 		# If it's a higher IV than all previous ones, try to check if the client seems patched

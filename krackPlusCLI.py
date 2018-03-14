@@ -64,10 +64,10 @@ def main():
             log.warning("Connect to " + options.ssid + " with " + options.password + " to scan devices")
             log.info("Waiting for devices to connect...")
             #Create a wireless network and scan devices that connect to to it
-	    with open('scanOutput.txt', 'w') as scanOutput:
+      	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
                 subprocess.call(["./outputHandler.sh scanOutput.txt"], shell=True)
-            #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"])
+                #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"])
         except KeyboardInterrupt:
             log.info("Generating PDF with findings...")
             log.info("Cleaning up...")
