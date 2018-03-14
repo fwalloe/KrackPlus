@@ -72,7 +72,7 @@ def printDictionary(dictionary):
 
 def writeDictionary(dictionary, file):
 
-    with open(dictionary, 'w') as MacIP:
+    with open(file, 'w') as MacIP:
 
         # Prints the dictionary to file
         for key, value in dictionary.iteritems():
