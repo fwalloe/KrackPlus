@@ -35,7 +35,7 @@ nmcli radio wifi off
 ./findVulnerable/krackattack/disable-hwcrypto.sh
 
 # Replace default password if user requests it
-if [ $1 == "customCredentials" ]
+if [ "$1" == "customCredentials" ]
 then
 	sed -i "88s/.*/ssid=$(sed '1q;d' networkCredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
 	sed -i "1146s/.*/wpa_passphrase=$(sed '2q;d' networkCredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
