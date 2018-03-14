@@ -30,10 +30,6 @@ then
 	cd ../../
 fi
 
-
-#TODO
-echo "About to kill and then scan"
-
 #Disable network
 sudo airmon-ng check kill
 
