@@ -66,24 +66,29 @@ def main():
             #Create a wireless network and scan devices that connect to to it
 	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py & ./outputHandler.sh scanOutput.txt"], stdout=scanOutput, shell=True)
-            print "TESTER LARS SCRIPT"
+            print "TESTER LARS SCRIPT" #TODO husk denne
             #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"])
         except KeyboardInterrupt:
             log.info("Generating PDF with findings ...")
             log.info("Restoring internet connection ...")
             subprocess.call(["./restoreClientWifi.sh"])
-	    sys.exit(0)
         # if --os-detection:
         if options.os:
             print "NMAP"
         
     # Running attack scripts
     elif options.attack:
-        print("Performing key reinstallation attack")
-        #Sets up dependencies before the attack script runs
-        subprocess.call(["./prepareClientAttack.sh"])
+        try:
+            print("Performing key reinstallation attack")
+            #Sets up dependencies before the attack script runs
+            subprocess.call(["./prepareClientAttack.sh"])
         #TODO subprocess, run attack script; note that this static implementation is only for testing purposes and should be removed. 	
         #subprocess.call(["./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa"])
+        except KeyboardInterrupt:
+            log.info("Cleaning up and restoring wifi ...")
+            subprocess.call(["./restoreClientWifi.sh"])
+
+
 
     # Must specify an option    
     else:
