@@ -50,12 +50,9 @@ def main():
     # Running scan scripts
     # TODO we have two ifs here. Inner one should not be necessary. 
     if options.scan:
-        if options.ssid and options.password:
-            #Write the credentials to file, so that they can be used next time the progran runs.
-            with open('networkCredentials.txt', 'w') as netCredentials:
-                netCredentials.write(options.ssid + '\n' + options.password)
-        #Replace default credentials with user-supplied ones in hostapd     
-        log.warning("Connect to " + options.ssid + " with " + options.password + " to scan devices")
+        #Write the credentials to file, so that they can be used next time the progran runs.
+        with open('networkCredentials.txt', 'w') as netCredentials:
+            netCredentials.write(options.ssid + '\n' + options.password)
 	# TODO what is this?
         #thread.start_new_thread(parse, "scanOutput.txt")
         try:
@@ -64,11 +61,12 @@ def main():
                 subprocess.check_call(['./prepareClientScan.sh', 'customCredentials'])
             else:
                 subprocess.call(["./prepareClientScan.sh"])
-         
+            log.warning("Connect to " + options.ssid + " with " + options.password + " to scan devices")
+            log.info("Waiting for devices to connect...")
             #Create a wireless network and scan devices that connect to to it
 	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], stdout=scanOutput)
-            #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
+            subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
         except KeyboardInterrupt:
             log.info("Generating PDF with findings ...")
             log.info("Restoring internet connection ...")
