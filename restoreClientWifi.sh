@@ -2,6 +2,8 @@
 
 #This script should restore wifi to a wireless interface that is in monitoring mode. 
 
+nmcli radio wifi on
+
 wlanName=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==3' | tr -d ':')
 
 systemctl start NetworkManager
