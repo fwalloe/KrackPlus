@@ -31,7 +31,7 @@ echo $scanOutput
 echo "Report"
 echo ""
 
-#while true; do
+while true; do
 
 newFileContent=$(cat $input)
 diff=$(printf "$newFileContent" | grep -v "$fileContent")
@@ -105,4 +105,4 @@ for line in $vulnMac ; do
    fi
 done
 
-#done
+done
