@@ -25,8 +25,8 @@ if [[ ! -x "./krackattacks-poc-zerokey/hostapd/hostapd" ]]
 then 
 	echo "Compiling hostapd"
 	cd ./krackattacks-poc-zerokey/hostapd/
-	cp defconfig .config 
-	make -j 2 > /dev/null
+	cp defconfig .config
+	make -j 2 1>/dev/null
 	cd ../../
 fi
 
