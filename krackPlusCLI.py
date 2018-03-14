@@ -78,6 +78,8 @@ def main():
         except KeyboardInterrupt:
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
+            writeResults()
+            subprocess.call("python ./genPDF.py")
             subprocess.call(["rm scanOutput.txt"], shell=True)
             log.info("PDF generated in '" + path + "'.")
         except:

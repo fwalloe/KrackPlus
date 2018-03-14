@@ -70,4 +70,21 @@ def printDictionary(dictionary):
         if key != '' and value != '':
                 print "Key: " + key + " has value: " + value
 
+def writeDictionary(dictionary, file):
+
+    with open(dictionary, 'w') as MacIP:
+
+        # Prints the dictionary to file
+        for key, value in dictionary.iteritems():
+            if key != '' and value != '':
+                MacIP.write(key + '\n')
+                MacIP.write(value, '\n')
+
+    MacIP.closed
+
+def writeResults():
+    writeDictionary(pairMacIP, './scannedMacIP.txt')
+    writeDictionary(pairwiseVulnMacIP, './pairwiseVulnMacIP.txt')
+    writeDictionary(groupVulnMacIP, './groupVulnMacIP.txt')
+
 
