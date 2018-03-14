@@ -65,8 +65,9 @@ def main():
             log.info("Waiting for devices to connect...")
             #Create a wireless network and scan devices that connect to to it
 	    with open('scanOutput.txt', 'w') as scanOutput:
-                subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], stdout=scanOutput)
-            subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh outputFromScan.txt"])
+                subprocess.call(["./findVulnerable/krackattack/krack-test-client.py & ./outputHandler.sh scanOutput.txt"], stdout=scanOutput, shell=True)
+            print "TESTER LARS SCRIPT"
+            #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"])
         except KeyboardInterrupt:
             log.info("Generating PDF with findings ...")
             log.info("Restoring internet connection ...")
