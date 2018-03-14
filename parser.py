@@ -16,9 +16,11 @@ def scanParser(nmap):
 		i = 0
 		mac = ''
 		ip = ''
-		pairMacIP = {mac:ip}
-                counter = 0
-		# goes through the file line by line
+	    pairMacIP = {mac:ip}
+		groupVulnMacIP = {mac:ip}
+        pairwiseVulnMacIP = {mac:ip}
+        counter = 0
+	    # goes through the file line by line
 		while True:
 		        time.sleep(0.5)
 		        for line in output.readlines():
@@ -44,8 +46,10 @@ def scanParser(nmap):
 					else:
 						if str("group") in line:
 							print (mac+" is vulnerable to group key reinstallation")
+                            groupVulnMacIP.update({mac:ip})
 						else:
 							print (mac+" is vulnerable to pairwise")
+                            pairwiseVulnMacIP.update({mac:ip})
                                                         
 def nmapOS(dictionary):
         print "Running NMAP OS Scan against connected devices..."
