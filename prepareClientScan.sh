@@ -23,7 +23,7 @@ then
 	echo "Compiling hostapd"
 	cd ./findVulnerable/hostapd/
 	cp defconfig .config 
-	make -j 2 > /dev/null
+	make -j 2 1>/dev/null
 	cd ../../
 fi
 
