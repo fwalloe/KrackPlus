@@ -2,7 +2,7 @@
 
 #This script should restore wifi to a wireless interface that is in monitoring mode. 
 
-wlanName=$(iw dev | awk '/Interface/ {print $2}')
+wlanName=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==3' | tr -d ':')
 
 systemctl start NetworkManager
 
