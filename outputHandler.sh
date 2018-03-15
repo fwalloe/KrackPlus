@@ -28,8 +28,7 @@ nmapScan() {
     echo $scanOutput
 }
 
-echo "Report"
-echo ""
+echo "Running scan..:"
 
 while true; do
 
@@ -51,7 +50,7 @@ for line in $macAndIP; do
         mac="$mac$addMac\n"
         IP="$IP$addIP\n"
         macIP="$macIP$addMac $addIP\n"
-        echo "device with mac-address $addMac connected"
+        echo "device with mac-address $addMac connected."
     fi
 done
 
