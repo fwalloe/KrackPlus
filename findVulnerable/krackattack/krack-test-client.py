@@ -7,7 +7,19 @@
 # See README for more details.
 
 import logging
-logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from colorlog import ColoredFormatter
+from subprocess import check_output
+LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
+logging.root.setLevel(logging.DEBUG)
+formatter = ColoredFormatter()
+stream = logging.StreamHandler()
+stream.setLevel(logging.DEBUG)
+stream.setFormatter(formatter)
+log = logging.getLogger('pythonConfig')
+log.setLevel(logging.DEBUG)
+log.addHandler(stream)
+
+
 from scapy.all import *
 from libwifi import *
 import sys, socket, struct, time, subprocess, atexit, select, os.path
