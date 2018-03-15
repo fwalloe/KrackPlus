@@ -34,7 +34,7 @@ with open('./forLars2.txt', 'r') as output:
 		if (str("DHCP reply")) in line:
 			line = line.split(']')[1]
 			mac = (line.split('DHCP')[0])
-			mac = mac[:-2]
+			mac = (str(mac).strip())[:-1]
 			#mac = (findUnique(mac))
 			ip = line.split('reply')[1]
 			ip = ip.split('to')[0]
@@ -51,14 +51,14 @@ with open('./forLars2.txt', 'r') as output:
 				if str("group") in line:
 					print (mac+" is vulnerable to group key reinstallation")
 				else:
-					print (mac+" is  vulnerable to pairwise")  
+					print (mac+" is vulnerable to pairwise")  
 				
 	
 #print ("mac: "+mac+" and ip: "+ip)
 
 # Prints everything in the hashmap (must be expanded if we make it a hashmap with four values
 for x in pairMacIP:
-    print (x) # Can be removed as this is only a count
+#    print (x) # Can be removed as this is only a count
     for y in pairMacIP[x]:
         print (y,':',pairMacIP[x][y])
 
