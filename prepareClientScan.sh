@@ -18,7 +18,7 @@ while read packages; do
 done <dependenciesClientScan
 
 # Make modified hostapd instance. Only needs to be done once. 
-if [[ ! -x "./findVulnerable/hostapd/" ]] 
+if [[ ! -x "./findVulnerable/hostapd/hostapd" ]] 
 then 
 	echo "Compiling hostapd"
 	cd ./findVulnerable/hostapd/
