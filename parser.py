@@ -11,7 +11,8 @@
 
 import re	# used for regular expressions
 
-# parses list to make it unique 
+# parses list to make it unique NOT CURRENTLY USED
+"""
 def findUnique( toParse ):
 	result = []
 	seen = set()
@@ -20,11 +21,13 @@ def findUnique( toParse ):
 			result.append(str(i).strip(','))
 			seen.add(i)
 	return result
-
+"""
 # open the file to parse and read line by line
 with open('./forLars2.txt', 'r') as output:
-	
 	i = 0
+	mac = ''
+	ip = ''
+	pairMacIP = { i: {'mac': mac, 'ip': ip} }
 	# goes through the file line by line
 	for line in output.readlines():
 		# Filter out interesting lines and parse them
@@ -35,7 +38,7 @@ with open('./forLars2.txt', 'r') as output:
 			#mac = (findUnique(mac))
 			ip = line.split('reply')[1]
 			ip = ip.split('to')[0]
-			pairMacIP = { i: {'mac': mac, 'ip': ip} } 
+			pairMacIP.update(i = {'mac': mac, 'ip': ip }) # does not update properly. And i does not work as a variable here.  
 			i = i+1
 		elif str("vulnerable") in line:
 			line = line.split(']')[1]
@@ -55,7 +58,7 @@ with open('./forLars2.txt', 'r') as output:
 
 # Prints everything in the hashmap (must be expanded if we make it a hashmap with four values
 for x in pairMacIP:
-    print (x)
+    print (x) # Can be removed as this is only a count
     for y in pairMacIP[x]:
         print (y,':',pairMacIP[x][y])
 
