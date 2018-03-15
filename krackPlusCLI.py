@@ -25,6 +25,9 @@ log.addHandler(stream)
 #log.error("Serious stuff, this is red for a reason")                 RED
 #log.critical("OH NO everything is on fire")                          SUPER RED/ORANGE
 
+log.debug("KRACK+ is a tool to scan for and exploit the KRACK vulnerability in WPA2, discovered by Mathy Vanhoef.")
+log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
+
 def main():
     parser = optparse.OptionParser()
 
@@ -46,37 +49,30 @@ def main():
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
 
     options, args = parser.parse_args()
-
+    path = "~/krack/"
     # Running scan scripts
     # TODO we have two ifs here. Inner one should not be necessary. 
     if options.scan:
         #Write the credentials to file, so that they can be used next time the progran runs.
         with open('networkCredentials.txt', 'w') as netCredentials:
             netCredentials.write(options.ssid + '\n' + options.password)
-	# TODO what is this?
-        #thread.start_new_thread(parse, "scanOutput.txt")
         try:
             #Runs if user has specified custom wlan credentials
-	    if options.ssid and options.password:
+	    if options.ssid is not 'testnetwork' and options.password is not 'abcdefgh':
                 subprocess.check_call(['./prepareClientScan.sh', 'customCredentials'])
             else:
                 subprocess.call(["./prepareClientScan.sh"])
-            log.warning("Connect to " + options.ssid + " with " + options.password + " to scan devices")
-            log.info("Waiting for devices to connect...")
-            #Create a wireless network and scan devices that connect to to it
+            log.info("Running KRACK+ Scan:")
+            log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
+            log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
       	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-                subprocess.call(["./outputHandler.sh scanOutput.txt"], shell=True)
-                #subprocess.call(["./outputHandler.sh outputFromScan.txt nmap"]) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"])
-
+                subprocess.call(["./outputHandler.sh scanOutput.txt nmap"], shell=True) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"], shell=True)
         except KeyboardInterrupt:
-            log.info("Generating PDF with findings...")
-            log.info("Cleaning up...")
+            log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
             subprocess.call(["rm scanOutput.txt"], shell=True)
-        # if --os-detection:
-        if options.os:
-            print "NMAP"
+            log.info("PDF generated in '" + path + "'.")
         
     # Running attack scripts
     elif options.attack:
