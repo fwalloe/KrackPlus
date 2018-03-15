@@ -451,7 +451,7 @@ class KRAckAttackClient():
 		self.process_eth_rx(p)
 
 	def configure_interfaces(self):
-		#log(STATUS, "Note: disable Wi-Fi in network manager & disable hardware encryption. Both may interfere with this script.")
+		log(STATUS, "Note: disable Wi-Fi in network manager & disable hardware encryption. Both may interfere with this script.")
 
 		# 0. Some users may forget this otherwise
 		subprocess.check_output(["rfkill", "unblock", "wifi"])
@@ -521,8 +521,7 @@ class KRAckAttackClient():
 		elif self.test_tptk == KRAckAttackClient.TPTK_RAND:
 			hostapd_command(self.hostapd_ctrl, "TEST_TPTK_RAND")
 
-                log(STATUS, "Make sure the client requests an IP using DHCP!", color="orange")
-		log(STATUS, "Ready. Connect to this Access Point/Wi-Fi to start the tests.", color="green")
+		log(STATUS, "Ready. Connect to this Access Point to start the tests. Make sure the client requests an IP using DHCP!", color="green")
 
 		# Monitor both the normal interface and virtual monitor interface of the AP
 		self.next_arp = time.time() + 1
@@ -545,13 +544,13 @@ class KRAckAttackClient():
 						self.sock_eth.send(request)
 
 	def stop(self):
-		log(STATUS, "Closing hostapd and cleaning up ...", color="green")
+		log(STATUS, "Closing hostapd and cleaning up ...")
 		if self.hostapd:
 			self.hostapd.terminate()
 			self.hostapd.wait()
 		if self.sock_mon: self.sock_mon.close()
 		if self.sock_eth: self.sock_eth.close()
-                subprocess.call('nmcli radio wifi on', shell=True)
+
 
 def cleanup():
 	attack.stop()
@@ -613,12 +612,6 @@ if __name__ == "__main__":
 	elif test_tptk_rand:
 		test_tptk = KRAckAttackClient.TPTK_RAND
 
-        try:
-                attack = KRAckAttackClient()
-        except KeyboardInterrupt:
-	        atexit.register(cleanup)
-
-        try:
-                attack.run(test_grouphs=test_grouphs, test_tptk=test_tptk)
-        except KeyboardInterrupt:
-                atexit.register(cleanup)
+	attack = KRAckAttackClient()
+	atexit.register(cleanup)
+	attack.run(test_grouphs=test_grouphs, test_tptk=test_tptk)
