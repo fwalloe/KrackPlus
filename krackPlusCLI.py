@@ -71,9 +71,8 @@ def main():
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
                 #subprocess.call(["./outputHandler.sh scanOutput.txt nmap"], shell=True) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"], shell=True)
                 #subprocess.call(["python parser.py"], shell=True)
-                scanParser()
-                
-                
+            # options.os is a bool
+            scanParser(options.os)      
         except KeyboardInterrupt:
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
@@ -96,21 +95,18 @@ def main():
 	except:
             log.info("Error occurred. Restoring wifi ...")
             subprocess.call(["./restoreClientWifi.sh"])
-
-
+            
     # Must specify an option    
     else:
         log.warn("No option was given, please see usage below and try again!")
         parser.print_help()
 
 if __name__ == '__main__':
-   # main = Process(target=main)
-   # parser = Process(target=scanParser)
-    #nmap = Process(target=nmap)
-    
-    #main.start()
-    #parser.start()
+    #main = Process(target=main)
+    #main.start() 
     #main.join()
-    #parser.join()
+    #pairedMacIP = getDevices()
+    #nmap = Process(target=nmap)
+    #nmap.start(pairedMacIP)
+    #nmap.join()
     main()
-    

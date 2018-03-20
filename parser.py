@@ -11,7 +11,7 @@
 
 import re	# used for regular expressions
 import time
-def scanParser():
+def scanParser(nmap):
 	with open('./scanOutput.txt', 'r') as output:
 		i = 0
 		mac = ''
@@ -26,7 +26,7 @@ def scanParser():
 		                        # Filter out interesting lines and parse them
 		                if (str("AP-STA-CONNECTED")) in line:
 		                        connectedDevice = line.split("AP-STA-CONNECTED ")[1]
-		                        print "Device connected: " + connectedDevice
+		                        print "Device connected with MAC: " + connectedDevice
 				if (str("DHCP reply")) in line:
 		                        mac = (line.split('DHCP')[0])
 					mac = (str(mac).strip())[:-1]
@@ -45,14 +45,11 @@ def scanParser():
 							print (mac+" is vulnerable to group key reinstallation")
 						else:
 							print (mac+" is vulnerable to pairwise")
-def getDevices():
-        return pairMacIP
-
-def nmap():
-        for key, value in pairMac.iteritems():
-                if key != '' and value != '':
-                        subprocess.call(["nmap -O " + value], shell=True)
-
+                        # Throws gaierror ErrNo -2, but dont know whats wrong....
+                        #if(nmap):
+                                #print "Running NMAP OS Scan against connected devices..."
+                                #with open("nmapOutput.txt", "w") as nmapOutput:
+                                        #subprocess.call(["nmap -O " + ip], stdout=nmapOutput, shell=True)
         
 def printConnectedDevices():
 	# Prints everything in the hashmap (must be expanded if we make it a hashmap with four values
