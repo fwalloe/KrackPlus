@@ -2,10 +2,11 @@
 
 #This script should restore wifi to a wireless interface that is in monitoring mode. 
 
+systemctl start NetworkManager
+
 nmcli radio wifi off
 nmcli radio wifi on
 
-systemctl start NetworkManager
 
 #As 
 for i in {1..3}
