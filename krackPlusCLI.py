@@ -5,6 +5,7 @@ import subprocess
 import atexit
 import logging
 import thread
+#from multiprocessing import Process
 LOG_LEVEL = logging.DEBUG
 LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
 from colorlog import ColoredFormatter
@@ -67,7 +68,8 @@ def main():
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
       	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-                subprocess.call(["./outputHandler.sh scanOutput.txt nmap"], shell=True) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"], shell=True)
+                #subprocess.call(["./outputHandler.sh scanOutput.txt nmap"], shell=True) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"], shell=True)
+                subprocess.call(["python parser.py"], shell=True)
         except KeyboardInterrupt:
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
@@ -99,4 +101,11 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+    #main = Process(target=main)
+    #parser = Process(target=scanParser)
+    #main.start()
+    #parser.start()
+    #main.join()
+    #parser.join()
 
