@@ -10,7 +10,7 @@
 ###
 
 import re	# used for regular expressions
-
+import time
 # parses list to make it unique NOT CURRENTLY USED
 """
 def findUnique( toParse ):
@@ -29,29 +29,31 @@ with open('./forLars2.txt', 'r') as output:
 	ip = ''
 	pairMacIP = { i: {'mac': mac, 'ip': ip} }
 	# goes through the file line by line
-	for line in output.readlines():
-		# Filter out interesting lines and parse them
-		if (str("DHCP reply")) in line:
-			line = line.split(']')[1]
-			mac = (line.split('DHCP')[0])
-			mac = (str(mac).strip())[:-1]
-			#mac = (findUnique(mac))
-			ip = line.split('reply')[1]
-			ip = ip.split('to')[0]
-			pairMacIP.update(i = {'mac': mac, 'ip': ip }) # does not update properly. And i does not work as a variable here.  
-			i = i+1
-		elif str("vulnerable") in line:
-			line = line.split(']')[1]
-			if str("DOESN'T") in line:
-				if str("group") in line:
-					print (mac+" is not vulnerable to group key reinstallation")
+	while True:	
+		time.sleep(1)
+		for line in output.readlines():
+			# Filter out interesting lines and parse them
+			if (str("DHCP reply")) in line:
+				line = line.split(']')[1]
+				mac = (line.split('DHCP')[0])
+				mac = (str(mac).strip())[:-1]
+				#mac = (findUnique(mac))
+				ip = line.split('reply')[1]
+				ip = ip.split('to')[0]
+				pairMacIP.update(i = {'mac': mac, 'ip': ip }) # does not update properly. And i does not work as a variable here.  
+				i = i+1
+			elif str("vulnerable") in line:
+				line = line.split(']')[1]
+				if str("DOESN'T") in line:
+					if str("group") in line:
+						print (mac+" is not vulnerable to group key reinstallation")
+					else:
+						print (mac+" is not vulnerable to pairwise")  
 				else:
-					print (mac+" is not vulnerable to pairwise")  
-			else:
-				if str("group") in line:
-					print (mac+" is vulnerable to group key reinstallation")
-				else:
-					print (mac+" is vulnerable to pairwise")  
+					if str("group") in line:
+						print (mac+" is vulnerable to group key reinstallation")
+					else:
+						print (mac+" is vulnerable to pairwise")  
 				
 	
 #print ("mac: "+mac+" and ip: "+ip)
