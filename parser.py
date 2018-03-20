@@ -10,57 +10,48 @@
 ###
 
 import re	# used for regular expressions
-
-# parses list to make it unique NOT CURRENTLY USED
-"""
-def findUnique( toParse ):
-	result = []
-	seen = set()
-	for i in toParse:
-		if i not in seen:
-			result.append(str(i).strip(','))
-			seen.add(i)
-	return result
-"""
-# open the file to parse and read line by line
-with open('./forLars2.txt', 'r') as output:
-	i = 0
+import time
+with open('./scanOutput.txt', 'r') as output:
+        i = 0
 	mac = ''
 	ip = ''
-	pairMacIP = { i: {'mac': mac, 'ip': ip} }
+        pairMacIP = {mac:ip}
 	# goes through the file line by line
-	for line in output.readlines():
-		# Filter out interesting lines and parse them
-		if (str("DHCP reply")) in line:
-			line = line.split(']')[1]
-			mac = (line.split('DHCP')[0])
-			mac = (str(mac).strip())[:-1]
-			#mac = (findUnique(mac))
-			ip = line.split('reply')[1]
-			ip = ip.split('to')[0]
-			pairMacIP.update(i = {'mac': mac, 'ip': ip }) # does not update properly. And i does not work as a variable here.  
-			i = i+1
-		elif str("vulnerable") in line:
-			line = line.split(']')[1]
-			if str("DOESN'T") in line:
-				if str("group") in line:
-					print (mac+" is not vulnerable to group key reinstallation")
-				else:
-					print (mac+" is not vulnerable to pairwise")  
-			else:
-				if str("group") in line:
-					print (mac+" is vulnerable to group key reinstallation")
-				else:
-					print (mac+" is vulnerable to pairwise")  
-				
-	
-#print ("mac: "+mac+" and ip: "+ip)
-
+        while True:
+                time.sleep(1)
+                for line in output.readlines():
+                        if (str("]")) in line:
+                                line = line.split(']')[1]
+                                # Filter out interesting lines and parse them
+                        if (str("AP-STA-CONNECTED")) in line:
+                                connectedDevice = line.split("AP-STA-CONNECTED ")[1]
+                                print "Device connected: " + connectedDevice
+		        if (str("DHCP reply")) in line:
+                                mac = (line.split('DHCP')[0])
+			        mac = (str(mac).strip())[:-1]
+			        ip = line.split('reply')[1]
+			        ip = (ip.split('to')[0]).strip()
+			        pairMacIP.update({mac:ip})
+			        i = i+1
+		        elif str("vulnerable") in line:
+                                if str("DOESN'T") in line:
+                                        if str("group") in line:
+					        print (mac+" is not vulnerable to group key reinstallation")
+				        else:
+					        print (mac+" is not vulnerable to pairwise")  
+			        else:
+				        if str("group") in line:
+					        print (mac+" is vulnerable to group key reinstallation")
+				        else:
+					        print (mac+" is vulnerable to pairwise")  
 # Prints everything in the hashmap (must be expanded if we make it a hashmap with four values
-for x in pairMacIP:
-#    print (x) # Can be removed as this is only a count
-    for y in pairMacIP[x]:
-        print (y,':',pairMacIP[x][y])
+print "Connected devices:"
+for key, value in pairMacIP.iteritems():
+        if key != '' and value != '':
+                print "Mac: " + key + " has IP " + value
+
+
+       
 
 
 
