@@ -5,7 +5,8 @@ import subprocess
 import atexit
 import logging
 import thread
-#from multiprocessing import Process
+from parser import *
+from multiprocessing import Process
 LOG_LEVEL = logging.DEBUG
 LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
 from colorlog import ColoredFormatter
@@ -69,13 +70,15 @@ def main():
       	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
                 #subprocess.call(["./outputHandler.sh scanOutput.txt nmap"], shell=True) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"], shell=True)
-                subprocess.call(["python parser.py"], shell=True)
+                #subprocess.call(["python parser.py"], shell=True)
+                scanParser()
+                
+                
         except KeyboardInterrupt:
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
             subprocess.call(["rm scanOutput.txt"], shell=True)
             log.info("PDF generated in '" + path + "'.")
-        
     # Running attack scripts
     elif options.attack:
         try:
@@ -96,12 +99,13 @@ def main():
         parser.print_help()
 
 if __name__ == '__main__':
-    main()
-
-    #main = Process(target=main)
-    #parser = Process(target=scanParser)
+   # main = Process(target=main)
+   # parser = Process(target=scanParser)
+    #nmap = Process(target=nmap)
+    
     #main.start()
     #parser.start()
     #main.join()
     #parser.join()
-
+    main()
+    
