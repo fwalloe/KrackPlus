@@ -62,7 +62,3 @@ def printConnectedDevices():
 		        print "Mac: " + key + " has IP " + value
 
 
-       
-
-
-

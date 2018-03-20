@@ -79,6 +79,9 @@ def main():
             subprocess.call(["./restoreClientWifi.sh"])
             subprocess.call(["rm scanOutput.txt"], shell=True)
             log.info("PDF generated in '" + path + "'.")
+        except:
+            log.info("Error occurred. Restoring wifi ...")
+            subprocess.call(["./restoreClientWifi.sh"])
     # Running attack scripts
     elif options.attack:
         try:
@@ -90,7 +93,9 @@ def main():
         except KeyboardInterrupt:
             log.info("Cleaning up and restoring wifi ...")
             subprocess.call(["./restoreClientWifi.sh"])
-
+	except:
+            log.info("Error occurred. Restoring wifi ...")
+            subprocess.call(["./restoreClientWifi.sh"])
 
 
     # Must specify an option    
