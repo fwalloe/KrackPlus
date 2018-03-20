@@ -3,6 +3,12 @@
 # Install dependencies
 echo "Setting up dependencies..."
 
+
+#Disable network
+sudo nmcli radio wifi off
+sudo rfkill unblock wifi
+
+
 # Set interface variables:
 #eth0=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==1' | tr -d ':')
 
@@ -30,7 +36,8 @@ then
 	cd ../../
 fi
 
-./findVulnerable/krackattack/disable-hwcrypto.sh
+# TODO should only be run the first time!
+#./findVulnerable/krackattack/disable-hwcrypto.sh
 
 # Disable hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
 
@@ -44,10 +51,6 @@ fi
 
 #TODO RUN: systool -vm ath9k_htc
 
-#Disable network
-#sudo airmon-ng check kill
-sudo nmcli radio wifi off
-sudo rfkill unblock wifi
 
 
 
