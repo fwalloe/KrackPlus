@@ -17,9 +17,10 @@ def scanParser(nmap):
 		mac = ''
 		ip = ''
 		pairMacIP = {mac:ip}
+                counter = 0
 		# goes through the file line by line
 		while True:
-		        time.sleep(1)
+		        time.sleep(0.5)
 		        for line in output.readlines():
 		                if (str("]")) in line:
 		                        line = line.split(']')[1]
@@ -34,9 +35,9 @@ def scanParser(nmap):
 					ip = (ip.split('to')[0]).strip()
 					pairMacIP.update({mac:ip})
 					i = i+1
-				elif str("vulnerable") in line:
-		                        if str("DOESN'T") in line:
-		                                if str("group") in line:
+				if (str("vulnerable")) in line:
+		                        if (str("DOESN'T")) in line:
+		                                if (str("group")) in line:
 							print (mac+" is not vulnerable to group key reinstallation")
 						else:
 							print (mac+" is not vulnerable to pairwise")  
@@ -45,17 +46,19 @@ def scanParser(nmap):
 							print (mac+" is vulnerable to group key reinstallation")
 						else:
 							print (mac+" is vulnerable to pairwise")
-                        # Throws gaierror ErrNo -2, but dont know whats wrong....
-                        #if(nmap):
-                                #print "Running NMAP OS Scan against connected devices..."
-                                #with open("nmapOutput.txt", "w") as nmapOutput:
-                                        #subprocess.call(["nmap -O " + ip], stdout=nmapOutput, shell=True)
-        
-def printConnectedDevices():
-	# Prints everything in the hashmap (must be expanded if we make it a hashmap with four values
-	print "Connected devices:"
-	for key, value in pairMacIP.iteritems():
+                                                        
+def nmapOS(dictionary):
+        print "Running NMAP OS Scan against connected devices..."
+        with open('nmapOutput.txt', 'w') as nmapOutput:
+                for key, value in dictionary.iteritems():
+                        if key != '' and value != '':
+                                print value
+                                subprocess.check_output(["nmap -O " + value], stdout=nmapOutput, shell=True)
+
+def printDictionary(dictionary):
+	# Prints everything in the dictionary.
+	for key, value in dictionary.iteritems():
 		if key != '' and value != '':
-		        print "Mac: " + key + " has IP " + value
+		        print "Key: " + key + " has value: " + value
 
 
