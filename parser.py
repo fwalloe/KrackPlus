@@ -51,3 +51,7 @@ print "Connected devices:"
 for key, value in pairMacIP.iteritems():
         if key != '' and value != '':
                 print "Mac: " + key + " has IP " + value
+
+
+
+
