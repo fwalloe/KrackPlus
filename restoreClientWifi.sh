@@ -1,23 +1,32 @@
 #!/bin/bash
 
-#This script should restore wifi to a wireless interface that is in monitoring mode. 
+#This script should (aggressively) restore wifi to wireles interfaces after either scan or attack. 
 
 systemctl start NetworkManager
 
 nmcli radio wifi off
 nmcli radio wifi on
 
+# Restore main interface by default name 
+ifconfig wlan0 down > /dev/null
+iwconfig wlan0 mode managed > /dev/null
+ifconfig wlan0 up > /dev/null
 
-#As 
+# Restore the external interface by default name 
+ifconfig wlan1 down > /dev/null
+iwconfig wlan1 mode managed > /dev/null
+ifconfig wlan1 up > /dev/null
+
+# Loop over and try to restore interfaces by name
 for i in {1..3}
 do
 	wlanName=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk "FNR==3" | tr -d ':')
 
 	if ! echo $wlanName | grep -q 'w';
 	then
-		ifconfig $wlanName down
-		iwconfig $wlanName mode managed
-		ifconfig $wlanName up
+		ifconfig $wlanName down > /dev/null
+		iwconfig $wlanName mode managed > /dev/null
+		ifconfig $wlanName up > /dev/null
 	fi
 done
 
