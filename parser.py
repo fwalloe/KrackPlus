@@ -11,14 +11,17 @@
 
 import re	# used for regular expressions
 import time
+import subprocess
+
+mac = ''
+ip = ''
+pairMacIP = {mac: ip}
+groupVulnMacIP = {mac: ip}
+pairwiseVulnMacIP = {mac: ip}
+
 def scanParser(nmap):
     with open('./scanOutput.txt', 'r') as output:
         i = 0
-        mac = ''
-        ip = ''
-        pairMacIP = {mac:ip}
-        groupVulnMacIP = {mac:ip}
-        pairwiseVulnMacIP = {mac:ip}
         counter = 0
         # goes through the file line by line
         while True:
@@ -54,13 +57,13 @@ def scanParser(nmap):
 def nmapOS(dictionary):
         print "Running NMAP OS Scan against connected devices..."
         with open('nmapOutput.txt', 'w') as nmapOutput:
-                for key, value in dictionary.iteritems():
-                        if key != '' and value != '':
-                                print value
-                                subprocess.check_output(["nmap -O " + value], stdout=nmapOutput, shell=True)
+            for key, value in dictionary.iteritems():
+                if key != '' and value != '':
+                    print value
+                    subprocess.check_output(["nmap -O " + value], stdout=nmapOutput, shell=True)
 
 def printDictionary(dictionary):
-	# Prints everything in the dictionary.
-	for key, value in dictionary.iteritems():
-		if key != '' and value != '':
-		        print "Key: " + key + " has value: " + value
+    # Prints everything in the dictionary.
+    for key, value in dictionary.iteritems():
+        if key != '' and value != '':
+                print "Key: " + key + " has value: " + value
