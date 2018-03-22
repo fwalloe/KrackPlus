@@ -31,17 +31,27 @@ FORKLARING AV ANGREPET I SVÆRT KORTE TREKK: type hva vil det si at man er sårb
 
 % Results of scan are added by the parse script
 \noindent \textbf{Vulnerable devices:} \newline \newline
-Device: \newline
-Operating system: Android 5.0 - 6.0 (Linux 3.10)
-Type: phone \newline
-MAC: \newline
-%Devices that are not vulnerable should get the following line: "Device does not appear to be vulnerable to KRACK.
-Vulnerable to: \newline
-Group Key Reinstallation Attacks
-Pairwise Key Reinstallation Attacks
-\end{document}
-54:27:58:63:14:aa
 
+% For each scanned device, this is the format:
+%Device nr. <x> \newline
+%MAC: <mac> \newline
+%IP: <IP> \newline
+%\newline
+% (If the device is vulnerable against at least one of the two types):
+% Vulnerable to: \newline
+% (if the device is vulnerable to pairwise):
+% Pairwise Key Reinstallation Attacks \newline
+% (if the device is vulnerable to group key reinstallation attacks):
+% Group Key Reinstallation Attacks \newline
+% (If the device is not vulnerable at all):
+% Not vulnerable \newline
+% \newline \newline
+
+% Should start right below here
+
+
+
+\end{document}
 
 
 
