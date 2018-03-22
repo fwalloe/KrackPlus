@@ -11,9 +11,16 @@
 
 import re	# used for regular expressions
 import time
+import subprocess
+
+mac = ''
+ip = ''
+pairMacIP = {mac: ip}
+groupVulnMacIP = {mac: ip}
+pairwiseVulnMacIP = {mac: ip}
+
 def scanParser(nmap):
 	with open('./scanOutput.txt', 'r') as output:
-		i = 0
 		mac = ''
 		ip = ''
 		pairMacIP = {mac:ip}
@@ -36,8 +43,6 @@ def scanParser(nmap):
 					ip = line.split('reply')[1]
 					ip = (ip.split('to')[0]).strip()
 					pairMacIP.update({mac:ip})
-                                        print ip
-					i = i+1
 				if (str("vulnerable")) in line:
 		                        if (str("DOESN'T")) in line:
 		                                if (str("group")) in line:
@@ -53,15 +58,16 @@ def scanParser(nmap):
 def nmapOS(dictionary):
         print "Running NMAP OS Scan against connected devices..."
         with open('nmapOutput.txt', 'w') as nmapOutput:
-                for key, value in dictionary.iteritems():
-                        if key != '' and value != '':
-                                print value
-                                subprocess.check_output(["nmap -O " + value], stdout=nmapOutput, shell=True)
+            for key, value in dictionary.iteritems():
+                if key != '' and value != '':
+                    print value
+                    subprocess.check_output(["nmap -O " + value], stdout=nmapOutput, shell=True)
 
 def printDictionary(dictionary):
-	# Prints everything in the dictionary.
-	for key, value in dictionary.iteritems():
-		if key != '' and value != '':
-		        print "Key: " + key + " has value: " + value
+
+    # Prints everything in the dictionary.
+    for key, value in dictionary.iteritems():
+        if key != '' and value != '':
+                print "Key: " + key + " has value: " + value
 
 
