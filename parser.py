@@ -63,7 +63,10 @@ def nmapOS(dictionary):
                     subprocess.check_output(["nmap -O " + value], stdout=nmapOutput, shell=True)
 
 def printDictionary(dictionary):
+
     # Prints everything in the dictionary.
     for key, value in dictionary.iteritems():
         if key != '' and value != '':
                 print "Key: " + key + " has value: " + value
+
+
