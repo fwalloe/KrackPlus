@@ -17,6 +17,8 @@ def scanParser(nmap):
 		mac = ''
 		ip = ''
 		pairMacIP = {mac:ip}
+                groupVulnMacIP = {mac:ip}
+                pairwiseVulnMacIP = {mac:ip}
                 counter = 0
 		# goes through the file line by line
 		while True:
@@ -34,6 +36,7 @@ def scanParser(nmap):
 					ip = line.split('reply')[1]
 					ip = (ip.split('to')[0]).strip()
 					pairMacIP.update({mac:ip})
+                                        print ip
 					i = i+1
 				if (str("vulnerable")) in line:
 		                        if (str("DOESN'T")) in line:
