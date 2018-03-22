@@ -59,7 +59,6 @@ def main():
     options, args = parser.parse_args()
     path = "~/krack/"
     # Running scan scripts
-    # TODO we have two ifs here. Inner one should not be necessary. 
     if options.scan:
         #Write the credentials to file, so that they can be used next time the progran runs.
         with open('networkCredentials.txt', 'w') as netCredentials:
@@ -75,13 +74,8 @@ def main():
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
       	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-                #subprocess.call(["./outputHandler.sh scanOutput.txt nmap"], shell=True) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"], shell=True)
-                #subprocess.call(["python parser.py"], shell=True)
-            # options.os is a bool
-            scanParser(options.os)      
+            scanParser()      
         except KeyboardInterrupt:
-            if options.os:
-                nmapOS(parser.pairMacIP)
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
             subprocess.call(["rm scanOutput.txt"], shell=True)
