@@ -62,5 +62,5 @@ fi
 ## TODO To check: the nohwcript/.. param has been set.
 
 # TODO Look for key reinstallations in the 4-way handshake
-./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa
+#./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa
 
