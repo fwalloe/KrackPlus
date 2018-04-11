@@ -13,9 +13,10 @@ iwconfig wlan0 mode managed > /dev/null
 ifconfig wlan0 up > /dev/null
 
 # Restore the external interface by default name 
-ifconfig wlan1 down > /dev/null
-iwconfig wlan1 mode managed > /dev/null
-ifconfig wlan1 up > /dev/null
+# TODO should check whether wlan1 exists before it runs
+#ifconfig wlan1 down > /dev/null
+#iwconfig wlan1 mode managed > /dev/null
+#ifconfig wlan1 up > /dev/null
 
 # Loop over and try to restore interfaces by name
 for i in {1..3}
