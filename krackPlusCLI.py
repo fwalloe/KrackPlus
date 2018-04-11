@@ -33,12 +33,12 @@ log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kris
 def main():
     parser = optparse.OptionParser()
 
-   #Option to run KRACK vulnerability scan. 
+    #Option to run KRACK vulnerability scan. 
     parser.add_option('--scan','-s', help="This option will create a network with SSID 'testnetwork' where the default password is 'abcdefgh'."
                      " Simply connect to the network and the scan will be executed against the connected device.", dest='scan', default=False, action='store_true')
 
     #Option to add nmap OS/Device detection against clients being scanned.
-    parser.add_option('--os-detection', '-o', help="This option will add nmap OS/Device detection against clients being scanned", dest='os', default=False, action='store_true')
+    #parser.add_option('--os-detection', '-o', help="This option will add nmap OS/Device detection against clients being scanned", dest='os', default=False, action='store_true')
 
     #Option to set the SSID for the created test network.
     parser.add_option('--set-ssid', default='testnetwork', help="Use this option to set the SSID for the created network.", dest='ssid')
@@ -47,13 +47,18 @@ def main():
     parser.add_option('--set-password', default='abcdefgh', help="Use this option to set the password for the created network."
                       " Password length has to be 8 characters or more!", dest='password')
     
-    #Adding option to run attack against .....   
+    #Option to run attack against .....   
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
 
+    parser.add_option('--target', '-t', help="This option is used to specifiy target using MAC-adress when running attack.", dest='target')
+    parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
+    parser.add_
+    #Option to restore internet connection, if somehow restore script doesnt get triggered.
+    parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
+    
     options, args = parser.parse_args()
     path = "~/krack/"
     # Running scan scripts
-    # TODO we have two ifs here. Inner one should not be necessary. 
     if options.scan:
         #Write the credentials to file, so that they can be used next time the progran runs.
         with open('networkCredentials.txt', 'w') as netCredentials:
@@ -69,15 +74,12 @@ def main():
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
       	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-                #subprocess.call(["./outputHandler.sh scanOutput.txt nmap"], shell=True) if options.os else subprocess.call(["./outputHandler.sh scanOutput.txt"], shell=True)
-                #subprocess.call(["python parser.py"], shell=True)
-            # options.os is a bool
-            scanParser(options.os)      
+            scanParser()      
         except KeyboardInterrupt:
-            if options.os:
-                nmapOS(parser.pairMacIP) # WHY NOT WORK???? IS IT DEAD on keyboardinterrupt?
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
+            writeResults()
+            subprocess.call("python ./genPDF.py")
             subprocess.call(["rm scanOutput.txt"], shell=True)
             log.info("PDF generated in '" + path + "'.")
         except:
@@ -98,17 +100,15 @@ def main():
             log.info("Error occurred. Restoring wifi ...")
             subprocess.call(["./restoreClientWifi.sh"])
             
+    elif options.restore:
+        log.debug("Restoring internet connection")
+        subprocess.call(["./restoreClientWifi.sh"])
+        log.info("Done, it'll take a few seconds for the client to connect to your Wi-Fi again, if 'auto-connect' is enabled on your device")
+
     # Must specify an option    
     else:
         log.warn("No option was given, please see usage below and try again!")
         parser.print_help()
 
 if __name__ == '__main__':
-    #main = Process(target=main)
-    #main.start() 
-    #main.join()
-    #pairedMacIP = getDevices()
-    #nmap = Process(target=nmap)
-    #nmap.start(pairedMacIP)
-    #nmap.join()
     main()
