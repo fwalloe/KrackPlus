@@ -40,10 +40,10 @@ def scanParser():
 		                if (str("AP-STA-CONNECTED")) in line:
 		                        connectedDevice = line.split("AP-STA-CONNECTED ")[1]
                                         # Taking time since last device connected, to end script after 60s
-                                        newDeviceTime = time()
-                                        if (newDeviceTime - thePreviousDeviceTime <= 60):
-                                                thePreviousDeviceTime = newDeviceTime
-                                                sys.exit()
+                                        #newDeviceTime = time()
+                                        #if (newDeviceTime - thePreviousDeviceTime <= 60):
+                                        #        thePreviousDeviceTime = newDeviceTime
+                                        #        sys.exit()
 		                        print "Device connected with MAC: " + connectedDevice
 				if (str("DHCP reply")) in line:
 		                        mac = (line.split('DHCP')[0])
