@@ -1,0 +1,9 @@
+
+
+1. Running attack: stops because hostapd_rogue problem:
+	Probably a problem with hostapd. Redownload the repo and recompile
+2. Operation not possible due to rfkill
+	- Solution: must turn off internet using:
+		sudo nmcli radio wifi off
+		sudo rfkill unblock wifi
+		or sudo airmon-ng check kill
