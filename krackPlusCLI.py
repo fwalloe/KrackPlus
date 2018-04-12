@@ -72,7 +72,7 @@ def main():
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
       	    with open('scanOutput.txt', 'w') as scanOutput:
-                subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
+                subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], stdout=scanOutput, shell=True)
             scanParser()      
         except KeyboardInterrupt:
             log.info("Generating PDF with findings and cleaning up...")
