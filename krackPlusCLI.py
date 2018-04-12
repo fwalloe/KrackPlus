@@ -5,6 +5,7 @@ import subprocess
 import atexit
 import logging
 import thread
+import time
 from parser import *
 from multiprocessing import Process
 LOG_LEVEL = logging.DEBUG
@@ -31,25 +32,21 @@ log.debug("KRACK+ is a tool to scan for and exploit the KRACK vulnerability in W
 log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
 def main():
+    timeOfLastConnectedDevice = 0
     parser = optparse.OptionParser()
-
+    
     #Option to run KRACK vulnerability scan. 
     parser.add_option('--scan','-s', help="This option will create a network with SSID 'testnetwork' where the default password is 'abcdefgh'."
                      " Simply connect to the network and the scan will be executed against the connected device.", dest='scan', default=False, action='store_true')
-
     #Option to add nmap OS/Device detection against clients being scanned.
     #parser.add_option('--os-detection', '-o', help="This option will add nmap OS/Device detection against clients being scanned", dest='os', default=False, action='store_true')
-
     #Option to set the SSID for the created test network.
     parser.add_option('--set-ssid', default='testnetwork', help="Use this option to set the SSID for the created network.", dest='ssid')
-
     #Option kto set password for the created test network.
     parser.add_option('--set-password', default='abcdefgh', help="Use this option to set the password for the created network."
                       " Password length has to be 8 characters or more!", dest='password')
-    
     #Option to run attack against .....   
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
-
     parser.add_option('--target', '-t', help="This option is used to specifiy target using MAC-adress when running attack.", dest='target')
     parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
     #Option to restore internet connection, if somehow restore script doesnt get triggered.
@@ -65,7 +62,11 @@ def main():
         try:
             #Runs if user has specified custom wlan credentials
 	    if options.ssid is not 'testnetwork' and options.password is not 'abcdefgh':
-                subprocess.check_call(['./prepareClientScan.sh', 'customCredentials'])
+                if len(options.password) >= 8:
+                    subprocess.check_call(['./prepareClientScan.sh', 'customCredentials'])
+                else:
+                    log.warn("Password length has to be longer than 8 characters, try again or don't specify password; default would be 'abcdefgh'.")
+                    sys.exit()
             else:
                 subprocess.call(["./prepareClientScan.sh"])
             log.info("Running KRACK+ Scan:")
@@ -73,8 +74,10 @@ def main():
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
       	    with open('scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], stdout=scanOutput, shell=True)
-            scanParser()      
-        except KeyboardInterrupt:
+            scanParser()
+            if time()-timeLastConnectedDevice >= 60:
+                sys.exit()
+        except(KeyboardInterrupt, SystemExit):
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
             writeResults()
