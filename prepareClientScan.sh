@@ -34,11 +34,7 @@ nmcli radio wifi off
 ## TODO we should also make sure that this is reversed when the user is done... Perhaps make it an option
 #./findVulnerable/krackattack/disable-hwcrypto.sh
 
-#rfkill unblock wifi
+# Provide network credentials for the test network to hostapd
+sed -i "88s/.*/ssid=$(sed '1q;d' networkCredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
+sed -i "1146s/.*/wpa_passphrase=$(sed '2q;d' networkCredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
 
-# Replace default password if user requests it
-if [ "$1" == "customCredentials" ]
-then
-	sed -i "88s/.*/ssid=$(sed '1q;d' networkCredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
-	sed -i "1146s/.*/wpa_passphrase=$(sed '2q;d' networkCredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
-fi 
