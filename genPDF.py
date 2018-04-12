@@ -103,14 +103,9 @@ def writeValue(report, string):
     #subprocess.call("sed -i '" + str(lineNumber) + "s/.*/" + string + newline() + "/'" + " ./reportTemplate.tex", shell=True)
     report.write(string)
 
-# Get a 7 character long space
+# Get a n mm long space
 def getSpaces(n):
-    spaces = ""
-    i = 1
-    while (i <= n):
-        spaces+=str(' ')
-        i += 1
-    return spaces
+    return '\\hspace{' + str(n) + 'mm}'
 
 
 # Writes the individual scanned device and the corresponding data
@@ -119,25 +114,25 @@ def getSpaces(n):
 # "count" is just a number used to index them in the report
 def writeElement(report, mac, count):
 
-    writeValue(report, mac + ':' + getSpaces(8))
+    writeValue(report, mac + ':' + getSpaces(10))
 
     if pairwiseVulnMacIP.get(mac) is None and groupVulnMacIP.get(mac) is None:
         writeValue(report, 'x')
     else:
-        writeValue(report, ' ')
-    writeValue(report, getSpaces(11))
+        writeValue(report, getSpaces(1))
+    writeValue(report, getSpaces(29))
 
     if (pairwiseVulnMacIP.get(mac)) is not None:
         writeValue(report, 'x')
     else:
-        writeValue(report, ' ')
-    writeValue(report, getSpaces(10))
+        writeValue(report, getSpaces(1))
+    writeValue(report, getSpaces(29))
 
     if (groupVulnMacIP.get(mac)) is not None:
         writeValue(report, 'x')
     else:
-        writeValue(report, ' ')
-    writeValue(report, getSpaces(10))
+        writeValue(report, getSpaces(1))
+    writeValue(report, getSpaces(29))
 
     writeValue(report, newline() + '\n')
 
@@ -146,7 +141,7 @@ def writeElement(report, mac, count):
 # "startLine" is the line number to begin the writing
 def writeDocument():
     with open(pdf_name, "w+") as report:
-        with open('./texCode.txt', 'r') as initTexcode:
+        with open('./initTexCode.txt', 'r') as initTexcode:
             texCode = initTexcode.read()
             report.write(texCode)
         initTexcode.close()
