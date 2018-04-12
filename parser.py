@@ -19,7 +19,7 @@ pairMacIP = {mac: ip}
 groupVulnMacIP = {mac: ip}
 pairwiseVulnMacIP = {mac: ip}
 
-def scanParser(nmap):
+def scanParser():
 	with open('./scanOutput.txt', 'r') as output:
 		mac = ''
 		ip = ''
