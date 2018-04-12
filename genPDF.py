@@ -22,11 +22,10 @@ pdf_name = "./krackPlus-vulnerability-report_" + str(now.day) \
 # Test block
 # Should bo commented when functional. Uncomment the import above.
 
-path = "reports"
-if len(sys.argv) > 1:
-	path=sys.argv[1]
+path = "./reports/"
 
-
+# script should always be called with an argument, but if not, a default value will be used. 
+path = sys.argv[1] if len(sys.argv) > 1 else "./reports/"
 
 ip = ' '
 mac = ' '
@@ -168,7 +167,7 @@ getParserData()
 writeDocument()
 subprocess.call(["mkdir -p " + path], shell=True)
 subprocess.call(["pdflatex " + pdf_name + ".tex > /dev/null"], shell=True)
-subprocess.call(["mv " + pdf_name + ".pdf ./" + path + "/" + pdf_name + ".pdf"], shell=True)
+subprocess.call(["mv " + pdf_name + ".pdf " + path + pdf_name + ".pdf"], shell=True)
 subprocess.call(["rm " + pdf_name + ".tex > /dev/null"], shell=True)
 subprocess.call(["rm " + pdf_name + ".aux > /dev/null"], shell=True)
 subprocess.call(["rm " + pdf_name + ".log > /dev/null"], shell=True)

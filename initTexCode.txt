@@ -1,12 +1,21 @@
+%TODO:
+%Edit description
+%Edit title format
+%Add exact time
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
 \title{KRACK+ vulnerability report}
+
 \centering
+
 \begin{document}
 
 \maketitle
-This document shows the results of KRACK+ vulnerability scan. 1st column shows devices' mac-addresses, 2nd column shows whether retransmission of message 3 is
+This document shows the results of KRACK+ vulnerability scan.
+1st column shows devices' mac-addresses, 2nd and 3rd column
+shows if the device seems vulnerable against retransmission
+of message 3 in the pairwise and group handshake, respectively.
 \newline \newline
 
 \begin{center}
