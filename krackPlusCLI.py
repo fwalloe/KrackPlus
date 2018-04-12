@@ -74,8 +74,6 @@ def main():
             # options.os is a bool
             scanParser(options.os)      
         except KeyboardInterrupt:
-            if options.os:
-                nmapOS(parser.pairMacIP) # WHY NOT WORK???? IS IT DEAD on keyboardinterrupt?
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
             subprocess.call(["rm scanOutput.txt"], shell=True)
@@ -104,6 +102,7 @@ def main():
         parser.print_help()
 
 if __name__ == '__main__':
+	#TODO should these be removed?
     #main = Process(target=main)
     #main.start() 
     #main.join()
