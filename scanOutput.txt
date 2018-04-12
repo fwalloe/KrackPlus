@@ -1,0 +1,13 @@
+[15:09:29] Note: disable Wi-Fi in network manager & disable hardware encryption. Both may interfere with this script.
+[15:09:30] Starting hostapd ...
+Configuration file: /root/krack/findVulnerable/krackattack/hostapd.conf
+Using interface wlan0 with hwaddr 06:29:16:95:dd:55 and ssid "testnetwork"
+wlan0: interface state UNINITIALIZED->ENABLED
+wlan0: AP-ENABLED 
+wlan0: interface state ENABLED->DISABLED
+wlan0: AP-DISABLED 
+nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+connect exception  hostapd_ctrl/wlan0 9877
+[15:09:31] It seems hostapd did not start properly, please inspect its output.
+[15:09:31] Did you disable Wi-Fi in the network manager? Otherwise hostapd won't work.
+[15:09:31] Closing hostapd and cleaning up ...
