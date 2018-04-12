@@ -77,7 +77,7 @@ def main():
             scanParser()
             if time()-timeLastConnectedDevice >= 60:
                 sys.exit()
-        except KeyboardInterrupt:
+        except(KeyboardInterrupt, SystemExit):
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
             writeResults()
