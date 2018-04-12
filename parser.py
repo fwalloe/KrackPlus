@@ -9,7 +9,7 @@
 #
 ###
 
-import re	# used for regular expressions
+import re	# used for regular expressions TODO: Har vi noen RE's?
 import time
 import subprocess
 
@@ -64,22 +64,18 @@ def nmapOS(dictionary):
                     subprocess.check_output(["nmap -O " + value], stdout=nmapOutput, shell=True)
 
 def printDictionary(dictionary):
-
     # Prints everything in the dictionary.
     for key, value in dictionary.iteritems():
         if key != '' and value != '':
                 print "Key: " + key + " has value: " + value
 
 def writeDictionary(dictionary, file):
-
     with open(file, 'w') as MacIP:
-
         # Prints the dictionary to file
         for key, value in dictionary.iteritems():
             if key != '' and value != '':
                 MacIP.write(key + '\n')
                 MacIP.write(value + '\n')
-
     MacIP.closed
 
 def writeResults():
