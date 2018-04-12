@@ -49,7 +49,7 @@ def main():
     # Running scan scripts
     if options.scan:
         #Write the credentials to file, so that they can be used next time the progran runs.
-        with open('~/krack/TEMP/networkCredentials.txt', 'w') as netCredentials:
+        with open('./networkCredentials.txt', 'w') as netCredentials:
             if len(options.password) >= 8:
                 netCredentials.write(options.ssid + '\n' + options.password)
 	    else:
@@ -61,7 +61,7 @@ def main():
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
 
-      	    with open('~/krack/TEMP/scanOutput.txt', 'w') as scanOutput:
+      	    with open('./scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
             	scanParser()
             #TODO this if will never be executed as scanParser has while True. 
@@ -71,8 +71,8 @@ def main():
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
             writeResults()
-            subprocess.call("./genPDF.py")
-            subprocess.call(["rm ~/krack/TEMP/scanOutput.txt"], shell=True)
+            subprocess.call("python ./genPDF.py")
+            subprocess.call(["rm scanOutput.txt"], shell=True)
             log.info("PDF generated in '" + path + "'.")
         except:
             log.info("Error occurred. Restoring wifi ...")
@@ -95,7 +95,7 @@ def main():
     elif options.restore:
         log.debug("Restoring internet connection")
         subprocess.call(["./restoreClientWifi.sh"])
-        log.info("Done, it'll take a few seconds for the client to connect to your Wi-Fi again, if 'auto-connect' is enabled on your device")
+        log.info("Done, it'll take a few seconds for the client to connect to your Wi-Fi again, if 'auto-reconnect' is enabled on your device")
 
     # Must specify an option    
     else:
