@@ -9,7 +9,7 @@ import datetime
 now = datetime.datetime.now()
 pdf_name = "./krackPlus-vulnerability-report_" + str(now.day) \
            + "-" + str(now.month) + "-" + str(now.year) + "-" + str(now.hour) \
-           + "-" + str(now.minute) + "-" + str(now.second) + ".tex"
+           + "-" + str(now.minute) + "-" + str(now.second)
 
 # Get the hashmaps with MAC- and IP-addresses
 # of scanned and vulnerable addresses
@@ -140,7 +140,7 @@ def writeElement(report, mac, count):
 # Writes about all the scanned devices
 # "startLine" is the line number to begin the writing
 def writeDocument():
-    with open(pdf_name, "w+") as report:
+    with open(pdf_name + ".tex", "w+") as report:
         with open('./initTexCode.txt', 'r') as initTexcode:
             texCode = initTexcode.read()
             report.write(texCode)
@@ -159,3 +159,9 @@ def writeDocument():
 getParserData()
 # Write the mac-addresses to file
 writeDocument()
+subprocess.call(["mkdir -p reports"], shell=True)
+subprocess.call(["pdflatex " + pdf_name + ".tex > /dev/null"], shell=True)
+subprocess.call(["mv " + pdf_name + ".pdf" + " ./reports/" + pdf_name + ".pdf"], shell=True)
+subprocess.call(["rm " + pdf_name + ".tex > /dev/null"], shell=True)
+subprocess.call(["rm " + pdf_name + ".aux > /dev/null"], shell=True)
+subprocess.call(["rm " + pdf_name + ".log > /dev/null"], shell=True)
