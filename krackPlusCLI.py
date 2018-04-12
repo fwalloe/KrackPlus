@@ -50,23 +50,21 @@ def main():
     if options.scan:
         #Write the credentials to file, so that they can be used next time the progran runs.
         with open('~/krack/TEMP/networkCredentials.txt', 'w') as netCredentials:
-            netCredentials.write(options.ssid + '\n' + options.password)
+            if len(options.password) >= 8:
+                netCredentials.write(options.ssid + '\n' + options.password)
+	    else:
+                log.warn("Password length has to be longer than 8 characters, try again or don't specify password; default would be 'abcdefgh'.")
+                sys.exit()
         try:
-            #Runs if user has specified custom wlan credentials
-	    if options.ssid is not 'testnetwork' and options.password is not 'abcdefgh':
-                if len(options.password) >= 8:
-                    subprocess.check_call(['./prepareClientScan.sh', 'customCredentials'])
-                else:
-                    log.warn("Password length has to be longer than 8 characters, try again or don't specify password; default would be 'abcdefgh'.")
-                    sys.exit()
-            else:
-                subprocess.call(["./prepareClientScan.sh"])
+            subprocess.call(["./prepareClientScan.sh"])
             log.info("Running KRACK+ Scan:")
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
+
       	    with open('~/krack/TEMP/scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-            scanParser()
+            	scanParser()
+            #TODO this if will never be executed as scanParser has while True. 
             if time()-timeLastConnectedDevice >= 60:
                 sys.exit()
         except(KeyboardInterrupt, SystemExit):
