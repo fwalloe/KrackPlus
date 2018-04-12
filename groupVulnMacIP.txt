@@ -1,4 +1,0 @@
-aaaa.bbbb.cccc.1111
-192.168.1.1
-aaaa.bbbb.cccc.2222
-192.168.1.2
