@@ -35,29 +35,21 @@ def main():
     timeOfLastConnectedDevice = 0
     parser = optparse.OptionParser()
     
-    #Option to run KRACK vulnerability scan. 
-    parser.add_option('--scan','-s', help="This option will create a network with SSID 'testnetwork' where the default password is 'abcdefgh'."
-                     " Simply connect to the network and the scan will be executed against the connected device.", dest='scan', default=False, action='store_true')
-    #Option to add nmap OS/Device detection against clients being scanned.
-    #parser.add_option('--os-detection', '-o', help="This option will add nmap OS/Device detection against clients being scanned", dest='os', default=False, action='store_true')
-    #Option to set the SSID for the created test network.
     parser.add_option('--set-ssid', default='testnetwork', help="Use this option to set the SSID for the created network.", dest='ssid')
-    #Option kto set password for the created test network.
-    parser.add_option('--set-password', default='abcdefgh', help="Use this option to set the password for the created network."
-                      " Password length has to be 8 characters or more!", dest='password')
-    #Option to run attack against .....   
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
     parser.add_option('--target', '-t', help="This option is used to specifiy target using MAC-adress when running attack.", dest='target')
     parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
-    #Option to restore internet connection, if somehow restore script doesnt get triggered.
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
-    
+    parser.add_option('--set-password', default='abcdefgh', help="Use this option to set the password for the created network."
+                      " Password length has to be 8 characters or more!", dest='password')
+    parser.add_option('--scan','-s', help="This option will create a network with SSID 'testnetwork' where the default password is 'abcdefgh'."
+                      " Simply connect to the network and the scan will be executed against the connected device.", dest='scan', default=False, action='store_true')
     options, args = parser.parse_args()
     path = "~/krack/"
     # Running scan scripts
     if options.scan:
         #Write the credentials to file, so that they can be used next time the progran runs.
-        with open('networkCredentials.txt', 'w') as netCredentials:
+        with open('~/krack/TEMP/networkCredentials.txt', 'w') as netCredentials:
             netCredentials.write(options.ssid + '\n' + options.password)
         try:
             #Runs if user has specified custom wlan credentials
@@ -72,8 +64,8 @@ def main():
             log.info("Running KRACK+ Scan:")
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
-      	    with open('scanOutput.txt', 'w') as scanOutput:
-                subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], stdout=scanOutput, shell=True)
+      	    with open('~/krack/TEMP/scanOutput.txt', 'w') as scanOutput:
+                subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
             scanParser()
             if time()-timeLastConnectedDevice >= 60:
                 sys.exit()
@@ -81,8 +73,8 @@ def main():
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
             writeResults()
-            subprocess.call("python ./genPDF.py")
-            subprocess.call(["rm scanOutput.txt"], shell=True)
+            subprocess.call("./genPDF.py")
+            subprocess.call(["rm ~/krack/TEMP/scanOutput.txt"], shell=True)
             log.info("PDF generated in '" + path + "'.")
         except:
             log.info("Error occurred. Restoring wifi ...")
