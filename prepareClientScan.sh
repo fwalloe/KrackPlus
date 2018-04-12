@@ -32,7 +32,9 @@ nmcli radio wifi off
 
 # Disables hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
 ## TODO we should also make sure that this is reversed when the user is done... Perhaps make it an option
-./findVulnerable/krackattack/disable-hwcrypto.sh
+#./findVulnerable/krackattack/disable-hwcrypto.sh
+
+#rfkill unblock wifi
 
 # Replace default password if user requests it
 if [ "$1" == "customCredentials" ]
