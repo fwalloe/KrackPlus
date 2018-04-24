@@ -13,6 +13,8 @@ import re	# used for regular expressions TODO: Har vi noen RE's?
 import time
 import subprocess
 
+
+
 mac = ''
 ip = ''
 pairMacIP = {mac: ip}
@@ -27,6 +29,7 @@ def scanParser():
                 groupVulnMacIP = {mac:ip}
                 pairwiseVulnMacIP = {mac:ip}
                 counter = 0
+                thePreviousDeviceTime = 0
 		# goes through the file line by line
 		while True:
 		        time.sleep(0.5)
@@ -36,6 +39,11 @@ def scanParser():
 		                        # Filter out interesting lines and parse them
 		                if (str("AP-STA-CONNECTED")) in line:
 		                        connectedDevice = line.split("AP-STA-CONNECTED ")[1]
+                                        # Taking time since last device connected, to end script after 60s
+                                        newDeviceTime = time()
+                                        if (newDeviceTime - thePreviousDeviceTime <= 60):
+                                                thePreviousDeviceTime = newDeviceTime
+                                                sys.exit()
 		                        print "Device connected with MAC: " + connectedDevice
 				if (str("DHCP reply")) in line:
 		                        mac = (line.split('DHCP')[0])
@@ -55,14 +63,6 @@ def scanParser():
 						else:
 							print (mac+" is vulnerable to pairwise")
                                                         
-def nmapOS(dictionary):
-        print "Running NMAP OS Scan against connected devices..."
-        with open('nmapOutput.txt', 'w') as nmapOutput:
-            for key, value in dictionary.iteritems():
-                if key != '' and value != '':
-                    print value
-                    subprocess.check_output(["nmap -O " + value], stdout=nmapOutput, shell=True)
-
 def printDictionary(dictionary):
     # Prints everything in the dictionary.
     for key, value in dictionary.iteritems():
