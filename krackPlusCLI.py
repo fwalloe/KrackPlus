@@ -65,8 +65,8 @@ def main():
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
             	scanParser()
             #TODO this if will never be executed as scanParser has while True. 
-            if time()-timeLastConnectedDevice >= 60:
-                sys.exit()
+            #if time()-timeLastConnectedDevice >= 60:
+             #   sys.exit()
         except(KeyboardInterrupt, SystemExit):
             log.info("Generating PDF with findings and cleaning up...")
             subprocess.call(["./restoreClientWifi.sh"])
