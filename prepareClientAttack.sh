@@ -5,8 +5,10 @@ echo "Setting up dependencies..."
 
 
 #Disable network, but ensure the script can still use wifi
-sudo nmcli radio wifi off
-#sudo airmon-ng check kill
+#sudo nmcli radio wifi off
+sudo airmon-ng check kill
+#ifconfig wlan0 down
+#ifconfig wlan1 down
 sudo rfkill unblock wifi
 
 
@@ -45,13 +47,6 @@ fi
 # TODO Let user choose whether to reboot computer
 ## NOTE not implemented
 #TODO RUN: systool -vm ath9k_htc
-
-
-
-
-
-
-
 
 ## TODO To check: the nohwcript/.. param has been set.
 
