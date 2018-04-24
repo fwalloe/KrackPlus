@@ -15,10 +15,10 @@ then
 	ifconfig wlan0 up > /dev/null
 fi 
 
-#if (ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk "FNR==3" | tr -d ':' | grep --quiet wlan0mon)
-#then
-# 	ifconfig wlan0mon down > /dev/null
-#fi
+if (ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk "FNR==3" | tr -d ':' | grep --quiet wlan0mon)
+then
+ 	ifconfig wlan0mon down > /dev/null
+fi
 
 #if (ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk "FNR==3" | tr -d ':' | grep --quiet wlan0sta1)
 #then
@@ -38,16 +38,16 @@ fi
 #fi 
 
 # Loop over and try to restore interfaces by name
-for i in {1..3}
-do
-	wlanName=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk "FNR==3" | tr -d ':')
+#for i in {1..3}
+#do
+#	wlanName=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk "FNR==3" | tr -d ':')
 
-	if ! echo $wlanName | grep -q 'w';
-	then
-		ifconfig $wlanName down > /dev/null
-		iwconfig $wlanName mode managed > /dev/null
-		ifconfig $wlanName up > /dev/null
-	fi
-done
+#	if ! echo $wlanName | grep -q 'w';
+#	then
+#		ifconfig $wlanName down > /dev/null
+#		iwconfig $wlanName mode managed > /dev/null
+#		ifconfig $wlanName up > /dev/null
+#	fi
+#done
 
 # TODO check whether the wlan interfaces are back up; if not, advice user to remove their external NIC and click a button to run this script again. 
