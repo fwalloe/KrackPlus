@@ -38,7 +38,7 @@ log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kris
 def main():
     timeOfLastConnectedDevice = 0
     help_text = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
-    path = "~/krack/"
+    path = "./reports/"
     parser = optparse.OptionParser(usage=help_text)
 
 
@@ -93,12 +93,11 @@ def main():
             		scanParser() 
     
         except(KeyboardInterrupt, SystemExit):
-                log.info("Cleaning up...")
-                subprocess.call(["./restoreClientWifi.sh"])
-                log.info("Generating PDF with findings and cleaning up...")
+		subprocess.call(["clear"], shell=True)
+                log.info("Cleaning up and generating PDF report of findings...")
                 subprocess.call(["./restoreClientWifi.sh"])
                 writeResults()
-                subprocess.call("python ./genPDF.py")
+                subprocess.call("./genPDF.py")
                 subprocess.call(["rm scanOutput.txt"], shell=True)
                 subprocess.call(["rm scannedMacIP.txt"], shell=True)
                 subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
@@ -106,16 +105,12 @@ def main():
                 log.info("PDF generated in '" + path + "'.")
         except:
             log.error("Error occurred.")
-            subprocess.call(["rm scanOutput.txt"], shell=True)
-            subprocess.call(["rm scannedMacIP.txt"], shell=True)
-            subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
-            subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
             log.info("Restoring internet connection.")
             subprocess.call(["./restoreClientWifi.sh"])
 
 
     ############# ATTACK ################
-    if options.attack and options.mon and options.rogue and options.target and options.targetSSID:
+    elif options.attack and options.mon and options.rogue and options.target and options.targetSSID and not options.scan:
         try:
             print("Performing key reinstallation attack")
             #Sets up dependencies before the attack script runs
@@ -136,6 +131,7 @@ def main():
             log.info("Error occurred. Restoring wifi ...")
             subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
+
     ############# RESTORE INTERNET ################        
     elif options.restore:
         log.debug("Restoring internet connection")
