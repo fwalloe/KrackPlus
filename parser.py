@@ -13,8 +13,6 @@ import re	# used for regular expressions TODO: Har vi noen RE's?
 import time
 import subprocess
 
-
-
 mac = ''
 ip = ''
 pairMacIP = {mac: ip}
