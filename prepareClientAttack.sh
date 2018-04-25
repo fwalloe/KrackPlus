@@ -6,7 +6,7 @@ echo "Setting up dependencies..."
 
 #Disable network, but ensure the script can still use wifi
 #sudo nmcli radio wifi off
-sudo airmon-ng check kill
+sudo airmon-ng check kill >> /dev/null
 #ifconfig wlan0 down
 #ifconfig wlan1 down
 sudo rfkill unblock wifi
@@ -40,7 +40,7 @@ then
 fi
 
 # TODO should only be run the first time!
-#./findVulnerable/krackattack/disable-hwcrypto.sh &
+#./findVulnerable/krackattack/disable-hwcrypto.sh 
 
 # Disable hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
 
