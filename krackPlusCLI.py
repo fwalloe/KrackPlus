@@ -113,31 +113,6 @@ def main():
             log.info("Restoring internet connection.")
             subprocess.call(["./restoreClientWifi.sh"])
 
-    """
-    elif options.scan and options.debug:
-        try:
-            subprocess.call(["./prepareClientScan.sh"])
-            subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], shell=True)
-        except(KeyboardInterrupt, SystemExit):
-            log.info("Cleaning up...")
-            subprocess.call(["./restoreClientWifi.sh"])
-        except:
-            log.error("Error occurred.")
-            log.info("Restoring internet connection.")
-            subprocess.call(["./restoreClientWifi.sh"])
-            
-    elif options.scan and options.dd:
-        try:
-            subprocess.call(["./prepareClientScan.sh"])
-            subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --debug"], shell=True)
-        except(KeyboardInterrupt, SystemExit):
-            subprocess.call(["./restoreClientWifi.sh"])
-        except:
-            log.error("Error occurred.")
-            log.info("Restoring internet connection.")
-            subprocess.call(["./restoreClientWifi.sh"])
-             
-"""
 
     ############# ATTACK ################
     if options.attack and options.mon and options.rogue and options.target and options.targetSSID:
