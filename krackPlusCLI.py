@@ -66,7 +66,7 @@ def main():
     options, args = parser.parse_args()
     
     ############# SCAN ################
-    if options.scan and not options.dd and not options.debug:
+    if options.scan and not options.dd and not options.debug and not options.attack:
         #Write the credentials to file, so that they can be used next time the progran runs.
         with open('./networkCredentials.txt', 'w') as netCredentials:
             if len(options.password) >= 8:
@@ -144,6 +144,10 @@ def main():
         subprocess.call(["./restoreClientWifi.sh"])
         log.info("Done, it'll take a few seconds for the client to connect to your Wi-Fi again, if 'auto-reconnect' is enabled on your device")
 
+    elif options.attack and options.scan:
+        log.warn("Scan and attack cannot be run simultaneously. Please specify either [-a] or [-s].")
+        parser.print_help()
+        
     ########## NO OPTION OR WRONG USAGE ###########    
     else:
         log.warn("No option was given or there were missing arguments, please see usage below and try again!")
