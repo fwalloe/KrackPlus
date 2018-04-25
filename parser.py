@@ -43,6 +43,7 @@ def scanParser():
                                         #        thePreviousDeviceTime = newDeviceTime
                                         #        sys.exit()
 		                        print "Device connected with MAC: " + connectedDevice
+					print "Scanning " + connectedDevice
 				if (str("DHCP reply")) in line:
 		                        mac = (line.split('DHCP')[0])
 					mac = (str(mac).strip())[:-1]
@@ -61,6 +62,13 @@ def scanParser():
 						else:
 							print (mac+" is vulnerable to pairwise")
                                                         
+
+def attackParser():
+	with open('./attackOutput.txt', 'r') as output:
+		while True:
+			for line in output.readlines():
+				print line
+
 def printDictionary(dictionary):
     # Prints everything in the dictionary.
     for key, value in dictionary.iteritems():
