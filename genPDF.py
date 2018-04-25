@@ -4,7 +4,12 @@
 
 import subprocess
 import re
+import datetime
 
+now = datetime.datetime.now()
+pdf_name = "./krackPlus-vulnerability-report_" + str(now.day) \
+           + "-" + str(now.month) + "-" + str(now.year) + "-" + str(now.hour) \
+           + "-" + str(now.minute) + "-" + str(now.second) + ".tex"
 
 # Get the hashmaps with MAC- and IP-addresses
 # of scanned and vulnerable addresses
@@ -58,9 +63,9 @@ def getParserData():
         for line in MACIP:
             if (line != ' '):
                 if (counter % 2 == 1):
-                    mac = line
+                    mac = line.rstrip()
                 else:
-                    ip = line
+                    ip = line.rstrip()
                     pairMacIP.update({mac:ip})
                 counter += 1
     MACIP.closed
@@ -71,9 +76,9 @@ def getParserData():
         for line in MACIP:
             if (line != ' '):
                 if (counter % 2 == 1):
-                    mac = line
+                    mac = line.rstrip()
                 else:
-                    ip = line
+                    ip = line.rstrip()
                     pairwiseVulnMacIP.update({mac:ip})
                 counter += 1
     MACIP.closed
@@ -84,9 +89,9 @@ def getParserData():
         for line in MACIP:
             if (line != ' '):
                 if (counter % 2 == 1):
-                    mac = line
+                    mac = line.rstrip()
                 else:
-                    ip = line
+                    ip = line.rstrip()
                     groupVulnMacIP.update({mac:ip})
                 counter += 1
     MACIP.closed
@@ -96,7 +101,16 @@ def getParserData():
 # "str" is the string to be written on this line
 def writeValue(report, string):
     #subprocess.call("sed -i '" + str(lineNumber) + "s/.*/" + string + newline() + "/'" + " ./reportTemplate.tex", shell=True)
-    report.write(string + newline() + '\n')
+    report.write(string)
+
+# Get a 7 character long space
+def getSpaces(n):
+    spaces = ""
+    i = 1
+    while (i <= n):
+        spaces+=str(' ')
+        i += 1
+    return spaces
 
 
 # Writes the individual scanned device and the corresponding data
@@ -104,31 +118,38 @@ def writeValue(report, string):
 # "str" is the mac-address of the device
 # "count" is just a number used to index them in the report
 def writeElement(report, mac, count):
-    writeValue(report, 'Device nr. ' + str(count))
-    writeValue(report, 'Mac: ' + mac)
-    writeValue(report, 'IP: ' + pairMacIP.get(mac))
-    writeValue(report, '')
-    if pairwiseVulnMacIP.get(mac) is not None and groupVulnMacIP.get(mac) is not None:
-        writeValue(report, 'Not vulnerable')
-    elif pairwiseVulnMacIP.get(mac) is not None or groupVulnMacIP.get(mac) is not None:
-        writeValue(report, 'Vulnerable to')
-        if (pairwiseVulnMacIP.get(mac)) is not None:
-            writeValue(report, 'Pairwise Key Reinstallation Attacks')
-        if (groupVulnMacIP.get(mac)) is not None:
-            writeValue(report, 'Group Key Reinstallation Attacks')
 
-    writeValue(report, '')
-    writeValue(report, '')
+    writeValue(report, mac + ':' + getSpaces(8))
+
+    if pairwiseVulnMacIP.get(mac) is None and groupVulnMacIP.get(mac) is None:
+        writeValue(report, 'x')
+    else:
+        writeValue(report, ' ')
+    writeValue(report, getSpaces(11))
+
+    if (pairwiseVulnMacIP.get(mac)) is not None:
+        writeValue(report, 'x')
+    else:
+        writeValue(report, ' ')
+    writeValue(report, getSpaces(10))
+
+    if (groupVulnMacIP.get(mac)) is not None:
+        writeValue(report, 'x')
+    else:
+        writeValue(report, ' ')
+    writeValue(report, getSpaces(10))
+
+    writeValue(report, newline() + '\n')
 
 
 # Writes about all the scanned devices
 # "startLine" is the line number to begin the writing
 def writeDocument():
-    with open('./reportTemplate.tex', 'w') as report:
+    with open(pdf_name, "w+") as report:
         with open('./texCode.txt', 'r') as initTexcode:
             texCode = initTexcode.read()
             report.write(texCode)
-        initTexcode.closed
+        initTexcode.close()
 
         count = 1
         for mac in pairMacIP.iterkeys():
@@ -136,7 +157,7 @@ def writeDocument():
                 writeElement(report, mac, count)
                 count += 1
         report.write('\end{document}')
-    report.closed
+    report.close()
 
 
 #addData()
