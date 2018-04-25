@@ -40,8 +40,13 @@ then
 fi
 
 # TODO should only be run the first time!
-#./findVulnerable/krackattack/disable-hwcrypto.sh 
 
+if ! cat hwEncryptionDisabled | grep -q '1';
+then 
+	./findVulnerable/krackattack/disable-hwcrypto.sh
+else 
+	echo "Hardware Encryption already disabled"
+fi
 # Disable hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
 
 # TODO Let user choose whether to reboot computer
