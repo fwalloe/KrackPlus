@@ -40,6 +40,8 @@ def main():
     parser.add_option('--target', '-t', help="This option is used to specifiy target using MAC-adress when running attack.", dest='target')
     parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
+    parser.add_option('-d', help="This option will increase output verbosity for debugging purposes", dest='debug', action='store_true')
+    parser.add_option('--dd', help="This option will increase output verbosity even more for extensive debugging.", dest='dd', action='store_true') 
     parser.add_option('--set-password', default='abcdefgh', help="Use this option to set the password for the created network."
                       " Password length has to be 8 characters or more!", dest='password')
     parser.add_option('--scan','-s', help="This option will create a network with SSID 'testnetwork' where the default password is 'abcdefgh'."
@@ -47,7 +49,7 @@ def main():
     options, args = parser.parse_args()
     path = "~/krack/"
     # Running scan scripts
-    if options.scan:
+    if options.scan and not options.dd and not options.debug:
         #Write the credentials to file, so that they can be used next time the progran runs.
         with open('./networkCredentials.txt', 'w') as netCredentials:
             if len(options.password) >= 8:
@@ -60,23 +62,45 @@ def main():
             log.info("Running KRACK+ Scan:")
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
-
       	    with open('./scanOutput.txt', 'w') as scanOutput:
                 subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-            	scanParser()
-            #TODO this if will never be executed as scanParser has while True. 
-            #if time()-timeLastConnectedDevice >= 60:
-             #   sys.exit()
+            	scanParser()     
         except(KeyboardInterrupt, SystemExit):
-            log.info("Generating PDF with findings and cleaning up...")
-            subprocess.call(["./restoreClientWifi.sh"])
-            writeResults()
-            subprocess.call("python ./genPDF.py")
-            subprocess.call(["rm scanOutput.txt"], shell=True)
-            log.info("PDF generated in '" + path + "'.")
+                log.info("Cleaning up...")
+                subprocess.call(["./restoreClientWifi.sh"])
+                log.info("Generating PDF with findings and cleaning up...")
+                subprocess.call(["./restoreClientWifi.sh"])
+                writeResults()
+                subprocess.call("python ./genPDF.py")
+                subprocess.call(["rm scanOutput.txt"], shell=True)
+                log.info("PDF generated in '" + path + "'.")
         except:
-            log.info("Error occurred. Restoring wifi ...")
+            log.error("Error occurred.")
+            log.info("Restoring internet connection.")
             subprocess.call(["./restoreClientWifi.sh"])
+    elif options.scan and options.debug:
+        try:
+            subprocess.call(["./prepareClientScan.sh"])
+            subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], shell=True)
+        except(KeyboardInterrupt, SystemExit):
+            log.info("Cleaning up...")
+            subprocess.call(["./restoreClientWifi.sh"])
+        except:
+            log.error("Error occurred.")
+            log.info("Restoring internet connection.")
+            subprocess.call(["./restoreClientWifi.sh"])
+            
+    elif options.scan and options.dd:
+        try:
+            subprocess.call(["./prepareClientScan.sh"])
+            subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --debug"], shell=True)
+        except(KeyboardInterrupt, SystemExit):
+            subprocess.call(["./restoreClientWifi.sh"])
+        except:
+            log.error("Error occurred.")
+            log.info("Restoring internet connection.")
+            subprocess.call(["./restoreClientWifi.sh"])
+                
     # Running attack scripts
     elif options.attack:
         try:
