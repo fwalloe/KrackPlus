@@ -66,22 +66,32 @@ def main():
     options, args = parser.parse_args()
     
     ############# SCAN ################
-    if options.scan and not options.dd and not options.debug and not options.attack:
-        #Write the credentials to file, so that they can be used next time the progran runs.
+    if options.scan and not options.attack:
+
+        # Write the credentials to file, so that they can be used next time the progran runs.
         with open('./networkCredentials.txt', 'w') as netCredentials:
             if len(options.password) >= 8:
                 netCredentials.write(options.ssid + '\n' + options.password)
 	    else:
                 log.warn("Password length has to be longer than 8 characters, try again or don't specify password; default would be 'abcdefgh'.")
                 sys.exit()
+	
+	# Attempt to launch scan, write output to file and display parsed output on screen
         try:
             subprocess.call(["./prepareClientScan.sh"])
             log.info("Running KRACK+ Scan:")
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
       	    with open('./scanOutput.txt', 'w') as scanOutput:
-                subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-            	scanParser()     
+
+		if options.scan and options.debug:
+			subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], shell=True)
+		elif options.scan and options.dd:
+			subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --debug"], shell=True)
+		else:
+                	subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
+            		scanParser() 
+    
         except(KeyboardInterrupt, SystemExit):
                 log.info("Cleaning up...")
                 subprocess.call(["./restoreClientWifi.sh"])
@@ -102,6 +112,8 @@ def main():
             subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
             log.info("Restoring internet connection.")
             subprocess.call(["./restoreClientWifi.sh"])
+
+    """
     elif options.scan and options.debug:
         try:
             subprocess.call(["./prepareClientScan.sh"])
@@ -124,9 +136,11 @@ def main():
             log.error("Error occurred.")
             log.info("Restoring internet connection.")
             subprocess.call(["./restoreClientWifi.sh"])
-                
+             
+"""
+
     ############# ATTACK ################
-    elif options.attack and options.mon and options.rogue and options.target and options.targetSSID:
+    if options.attack and options.mon and options.rogue and options.target and options.targetSSID:
         try:
             print("Performing key reinstallation attack")
             #Sets up dependencies before the attack script runs
