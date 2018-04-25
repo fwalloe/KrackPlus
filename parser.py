@@ -64,6 +64,13 @@ def scanParser():
 						else:
 							print (mac+" is vulnerable to pairwise")
                                                         
+
+def attackParser():
+	with open('./attackOutput.txt', 'r') as output:
+		while True:
+			for line in output.readlines():
+				print line
+
 def printDictionary(dictionary):
     # Prints everything in the dictionary.
     for key, value in dictionary.iteritems():
