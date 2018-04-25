@@ -624,6 +624,9 @@ if __name__ == "__main__":
 	elif test_tptk_rand:
 		test_tptk = KRAckAttackClient.TPTK_RAND
 
-	attack = KRAckAttackClient()
-	atexit.register(cleanup)
-	attack.run(test_grouphs=test_grouphs, test_tptk=test_tptk)
+	try:
+		attack = KRAckAttackClient()
+		atexit.register(cleanup)
+		attack.run(test_grouphs=test_grouphs, test_tptk=test_tptk)
+	except:
+		print "Scan encountered errors or was stopped by user"	
