@@ -85,9 +85,16 @@ def main():
                 writeResults()
                 subprocess.call("python ./genPDF.py")
                 subprocess.call(["rm scanOutput.txt"], shell=True)
+                subprocess.call(["rm scannedMacIP.txt"], shell=True)
+                subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
+                subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
                 log.info("PDF generated in '" + path + "'.")
         except:
             log.error("Error occurred.")
+            subprocess.call(["rm scanOutput.txt"], shell=True)
+            subprocess.call(["rm scannedMacIP.txt"], shell=True)
+            subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
+            subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
             log.info("Restoring internet connection.")
             subprocess.call(["./restoreClientWifi.sh"])
     elif options.scan and options.debug:
@@ -127,9 +134,11 @@ def main():
 		attackParser() 
         except KeyboardInterrupt:
             log.info("Cleaning up and restoring wifi ...")
+	    subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
 	except:
             log.info("Error occurred. Restoring wifi ...")
+            subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
             
     elif options.restore:
