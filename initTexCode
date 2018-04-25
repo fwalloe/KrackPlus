@@ -1,0 +1,17 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{KRACK+ vulnerability report}
+\centering
+\begin{document}
+
+\maketitle
+\begin{flushleft}
+This document shows the results of KRACK+ vulnerability scan. 1st column shows devices' mac-addresses, 2nd column shows whether retransmission of message 3 is
+\newline \newline
+\end{flushleft}
+
+\textbf{Device results}
+
+
+\end{document}
