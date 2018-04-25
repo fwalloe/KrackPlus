@@ -6,12 +6,13 @@
 \begin{document}
 
 \maketitle
-\begin{flushleft}
 This document shows the results of KRACK+ vulnerability scan. 1st column shows devices' mac-addresses, 2nd column shows whether retransmission of message 3 is
 \newline \newline
-\end{flushleft}
 
+\begin{center}
 \textbf{Device results}
+\end{center}
 
+\hspace{41mm} None \hspace{18mm} Re.Msg3 \hspace{16mm} Group
+\newline
 
-\end{document}

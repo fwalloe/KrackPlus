@@ -9,7 +9,7 @@ import datetime
 now = datetime.datetime.now()
 pdf_name = "./krackPlus-vulnerability-report_" + str(now.day) \
            + "-" + str(now.month) + "-" + str(now.year) + "-" + str(now.hour) \
-           + "-" + str(now.minute) + "-" + str(now.second) + ".tex"
+           + "-" + str(now.minute) + "-" + str(now.second)
 
 # Get the hashmaps with MAC- and IP-addresses
 # of scanned and vulnerable addresses
@@ -103,14 +103,9 @@ def writeValue(report, string):
     #subprocess.call("sed -i '" + str(lineNumber) + "s/.*/" + string + newline() + "/'" + " ./reportTemplate.tex", shell=True)
     report.write(string)
 
-# Get a 7 character long space
+# Get a n mm long space
 def getSpaces(n):
-    spaces = ""
-    i = 1
-    while (i <= n):
-        spaces+=str(' ')
-        i += 1
-    return spaces
+    return '\\hspace{' + str(n) + 'mm}'
 
 
 # Writes the individual scanned device and the corresponding data
@@ -119,25 +114,25 @@ def getSpaces(n):
 # "count" is just a number used to index them in the report
 def writeElement(report, mac, count):
 
-    writeValue(report, mac + ':' + getSpaces(8))
+    writeValue(report, mac + ':' + getSpaces(10))
 
     if pairwiseVulnMacIP.get(mac) is None and groupVulnMacIP.get(mac) is None:
         writeValue(report, 'x')
     else:
-        writeValue(report, ' ')
-    writeValue(report, getSpaces(11))
+        writeValue(report, getSpaces(1))
+    writeValue(report, getSpaces(29))
 
     if (pairwiseVulnMacIP.get(mac)) is not None:
         writeValue(report, 'x')
     else:
-        writeValue(report, ' ')
-    writeValue(report, getSpaces(10))
+        writeValue(report, getSpaces(1))
+    writeValue(report, getSpaces(29))
 
     if (groupVulnMacIP.get(mac)) is not None:
         writeValue(report, 'x')
     else:
-        writeValue(report, ' ')
-    writeValue(report, getSpaces(10))
+        writeValue(report, getSpaces(1))
+    writeValue(report, getSpaces(29))
 
     writeValue(report, newline() + '\n')
 
@@ -145,8 +140,8 @@ def writeElement(report, mac, count):
 # Writes about all the scanned devices
 # "startLine" is the line number to begin the writing
 def writeDocument():
-    with open(pdf_name, "w+") as report:
-        with open('./texCode.txt', 'r') as initTexcode:
+    with open(pdf_name + ".tex", "w+") as report:
+        with open('./initTexCode.txt', 'r') as initTexcode:
             texCode = initTexcode.read()
             report.write(texCode)
         initTexcode.close()
@@ -164,3 +159,9 @@ def writeDocument():
 getParserData()
 # Write the mac-addresses to file
 writeDocument()
+subprocess.call(["mkdir -p reports"], shell=True)
+subprocess.call(["pdflatex " + pdf_name + ".tex > /dev/null"], shell=True)
+subprocess.call(["mv " + pdf_name + ".pdf" + " ./reports/" + pdf_name + ".pdf"], shell=True)
+subprocess.call(["rm " + pdf_name + ".tex > /dev/null"], shell=True)
+subprocess.call(["rm " + pdf_name + ".aux > /dev/null"], shell=True)
+subprocess.call(["rm " + pdf_name + ".log > /dev/null"], shell=True)
