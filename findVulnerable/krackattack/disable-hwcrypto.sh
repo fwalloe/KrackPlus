@@ -34,4 +34,8 @@ do rmmod $MODULE 2> /dev/null || true; done
 
 # 3. Done. To be sure parameters are reloaded, reboot computer.
 
-echo "Done. Reboot your computer."
+echo "Disabled hwcrypto. Reboot your computer."
+
+# 4. Make sure this script only runs the first time.
+
+echo "1" > hwEncryptionDisabled
