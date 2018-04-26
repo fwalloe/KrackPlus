@@ -5,6 +5,7 @@
 import subprocess
 import re
 import datetime
+import sys
 
 now = datetime.datetime.now()
 pdf_name = "./krackPlus-vulnerability-report_" + str(now.day) \
@@ -20,6 +21,12 @@ pdf_name = "./krackPlus-vulnerability-report_" + str(now.day) \
 
 # Test block
 # Should bo commented when functional. Uncomment the import above.
+
+if sys.argv[1] is not "":
+	path=sys.argv[1]
+else:
+	path="./reports/"
+
 
 ip = ' '
 mac = ' '
@@ -161,7 +168,7 @@ getParserData()
 writeDocument()
 subprocess.call(["mkdir -p reports"], shell=True)
 subprocess.call(["pdflatex " + pdf_name + ".tex > /dev/null"], shell=True)
-subprocess.call(["mv " + pdf_name + ".pdf" + " ./reports/" + pdf_name + ".pdf"], shell=True)
+subprocess.call(["mv " + pdf_name + ".pdf" + " " + path + pdf_name + ".pdf"], shell=True)
 subprocess.call(["rm " + pdf_name + ".tex > /dev/null"], shell=True)
 subprocess.call(["rm " + pdf_name + ".aux > /dev/null"], shell=True)
 subprocess.call(["rm " + pdf_name + ".log > /dev/null"], shell=True)

