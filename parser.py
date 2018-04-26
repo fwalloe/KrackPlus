@@ -12,10 +12,7 @@
 import re	# used for regular expressions TODO: Har vi noen RE's?
 import datetime, time
 import subprocess
-
-
-
-
+import click
 
 mac = ''
 ip = ''
@@ -35,7 +32,7 @@ def scanParser():
 
                 time_last_connected_device = 0 
                 PERIOD_OF_TIME = 15 # 1.5min
-
+                number_of_connected_devices = 0
                 # goes through the file line by line
 		while True:
 		        time.sleep(0.5)
@@ -46,8 +43,13 @@ def scanParser():
 		                if (str("AP-STA-CONNECTED")) in line:
 		                        connectedDevice = line.split("AP-STA-CONNECTED ")[1]
                                         time_last_connected_device = time.time()
-		                        print "Device connected with MAC: " + connectedDevice
-					print "Scanning " + connectedDevice
+                                        number_of_connected_devices += 1 
+                                        print "Device connected with MAC: " + connectedDevice
+					print "Scanning " + connectedDevice + ":"
+
+                                        #with click.progressbar(range(10000000), label="Scanning for KRACK vulnerabilities") as bar:
+                                         #       for i in bar:
+                                          #              pass
 				if (str("DHCP reply")) in line:
 		                        mac = (line.split('DHCP')[0])
 					mac = (str(mac).strip())[:-1]
@@ -57,17 +59,20 @@ def scanParser():
 				if (str("vulnerable")) in line:
 		                        if (str("DOESN'T")) in line:
 		                                if (str("group")) in line:
-							print (mac+" is not vulnerable to group key reinstallation")
+                                                        pass
+							#print (mac+" is not vulnerable to group key reinstallation")
 						else:
-							print (mac+" is not vulnerable to pairwise")  
+                                                        pass
+							#print (mac+" is not vulnerable to pairwise")  
 					else:
 						if str("group") in line:
-							print (mac+" is vulnerable to group key reinstallation")
+							#print (mac+" is vulnerable to group key reinstallation")
                                                         groupVulnMacIP.update({mac:ip})
 						else:
-							print (mac+" is vulnerable to pairwise")
+							#print (mac+" is vulnerable to pairwise")
                                                         pairwiseVulnMacIP.update({mac:ip})
                                 if time.time() > time_last_connected_device + PERIOD_OF_TIME and time_last_connected_device > 0: break
+                                
 
 # THIS FUNCTION CAN PROBABLY BE DELETED!!  
 # Function to check if scanParser should continue, returns True if no device has connected
