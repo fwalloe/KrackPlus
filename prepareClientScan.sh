@@ -4,7 +4,6 @@
 echo "Setting up dependencies..."
 
 # Checks whether dependencies are already installed; if not, installs them.
-## NOTE / TODO maybe need to use gksudo with GUI
 while read packages; do
 	PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $packages | grep "install ok installed")
 	if [ "" == "$PKG_OK" ]; then
@@ -31,10 +30,12 @@ fi
 nmcli radio wifi off
 
 # Disables hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
-## TODO we should also make sure that this is reversed when the user is done... Perhaps make it an option
-#./findVulnerable/krackattack/disable-hwcrypto.sh
-
-#rfkill unblock wifi
+if ! cat hwEncryptionDisabled | grep -q '1';
+then 
+	./findVulnerable/krackattack/disable-hwcrypto.sh
+else 
+	echo "Hardware Encryption already disabled"
+fi
 
 # Replace default password if user requests it
 sed -i "88s/.*/ssid=$(sed '1q;d' ./networkCredentials.txt)/" ./findVulnerable/hostapd/hostapd.conf
