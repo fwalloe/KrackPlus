@@ -91,14 +91,13 @@ def main():
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
       	    with open('./scanOutput.txt', 'w') as scanOutput:
-
 		if options.scan and options.debug:
-			subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], shell=True)
+                    subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], shell=True)
 		elif options.scan and options.dd:
-			subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --debug"], shell=True)
+                    subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --debug"], shell=True)
 		else:
-                	subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-            		scanParser() 
+                    subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
+            	    scanParser() 
     
         except(KeyboardInterrupt, SystemExit):
                 log.info("Cleaning up...")
