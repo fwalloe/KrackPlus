@@ -2,9 +2,9 @@
 set -e
 
 # Interfaces that are used
-#INTERNET=eth0
 INTERNET=wlan0
-REPEATER=wlan1
+#INTERNET=wlan0
+REPEATER=wlan1sta1
 
 echo ""
 echo "[ ] Configuring IP address of malicious AP"

@@ -67,8 +67,30 @@ def attackParser():
 	with open('./attackOutput.txt', 'r') as output:
 		while True:
 			for line in output.readlines():
-				print line
+				
+				# Displays lines that contain any of the following strings
+				if (
+				str("Note") in line
+				or str("Established MitM") in line 
+				or str("Target network") in line
+				or str("Will create rogue AP") in line 
+				or str("Setting MAC address") in line
+				or str("Giving the rogue") in line
+				or str("Giving the rogue") in line
+				or str("Injecting Null frame so AP thinks") in line 
+				or str("injected Disassociation") in line
+				or str("2nd unique EAPOL msg3") in line
+				or str("Performing key reinstallation attack!") in line 
+				or str("forwarding EAPOL msg3") in line
+				or str("Deauth") in line
+				or str("failed") in line
+				or str("WARNING") in line
+				or str("SUCCESS") in line
+				or str("interceptig its traffic") in line
+				or str("hostapd") in line ):
+					print line
 
+		
 def printDictionary(dictionary):
     # Prints everything in the dictionary.
     for key, value in dictionary.iteritems():

