@@ -4,7 +4,8 @@ import optparse
 import subprocess
 import atexit
 import logging
-
+# to implement progress bar.
+import click
 #from parser import attackParser
 #from parser import scanParser
 #from parser import writeResults
@@ -103,7 +104,9 @@ def main():
     
         except(KeyboardInterrupt, SystemExit):
 		subprocess.call(["clear"], shell=True)
-                log.info("Cleaning up and generating PDF report of findings...")
+                with click.progressbar(range(100000), label="Cleaning up and generating PDF") as bar:
+                    for i in bar:
+                        pass
                 subprocess.call(["./restoreClientWifi.sh"])
                 writeResults()
 		if options.path:
@@ -112,10 +115,10 @@ def main():
 		else: 
 			subprocess.call("./genPDF.py")	
 			log.info("PDF generated in '" + path + "'.")
-                subprocess.call(["rm scanOutput.txt"])
-                subprocess.call(["rm scannedMacIP.txt"])
-                subprocess.call(["rm pairwiseVulnMacIP.txt"])
-                subprocess.call(["rm groupVulnMacIP.txt"])
+                subprocess.call(["rm scanOutput.txt"], shell=True)
+                subprocess.call(["rm scannedMacIP.txt"], shell=True)
+                subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
+                subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
                 
         #except:
          #   log.error("Error occurred.")
