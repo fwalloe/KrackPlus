@@ -133,7 +133,7 @@ def main():
                 #subprocess.call(["sslstrip -w sslstrip.log &"])
 	
 		# User will only see relevant output, unless debug is on
-		if options.debug
+		if options.debug:
 			print("Debug enabled")
 		else:            	
 			attackParser()
