@@ -5,10 +5,10 @@ import subprocess
 import atexit
 import logging
 
-from parser import attackParser
-from parser import scanParser
-from parser import writeResults
-
+#from parser import attackParser
+#from parser import scanParser
+#from parser import writeResults
+from parser import *
 from multiprocessing import Process
 from colorlog import ColoredFormatter
 from subprocess import check_output
@@ -49,6 +49,7 @@ def main():
     out, err = process.communicate()
     nic_rogue = out
 
+        
     # KRACK+ Attack options
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
     parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
@@ -111,15 +112,15 @@ def main():
 		else: 
 			subprocess.call("./genPDF.py")	
 			log.info("PDF generated in '" + path + "'.")
-                subprocess.call(["rm scanOutput.txt"], shell=True)
-                subprocess.call(["rm scannedMacIP.txt"], shell=True)
-                subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
-                subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
+                subprocess.call(["rm scanOutput.txt"])
+                subprocess.call(["rm scannedMacIP.txt"])
+                subprocess.call(["rm pairwiseVulnMacIP.txt"])
+                subprocess.call(["rm groupVulnMacIP.txt"])
                 
-        except:
-            log.error("Error occurred.")
-            log.info("Restoring internet connection.")
-            subprocess.call(["./restoreClientWifi.sh"])
+        #except:
+         #   log.error("Error occurred.")
+          #  log.info("Restoring internet connection.")
+           # subprocess.call(["./restoreClientWifi.sh"])
 
 
     ############# ATTACK ################

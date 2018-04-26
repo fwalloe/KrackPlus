@@ -10,8 +10,12 @@
 ###
 
 import re	# used for regular expressions TODO: Har vi noen RE's?
-import time
+import datetime, time
 import subprocess
+
+
+
+
 
 mac = ''
 ip = ''
@@ -27,8 +31,12 @@ def scanParser():
                 groupVulnMacIP = {mac:ip}
                 pairwiseVulnMacIP = {mac:ip}
                 counter = 0
-                thePreviousDeviceTime = 0
-		# goes through the file line by line
+                #now = datetime.datetime.now()
+
+                time_last_connected_device = 0 
+                PERIOD_OF_TIME = 15 # 1.5min
+
+                # goes through the file line by line
 		while True:
 		        time.sleep(0.5)
 		        for line in output.readlines():
@@ -37,11 +45,7 @@ def scanParser():
 		                        # Filter out interesting lines and parse them
 		                if (str("AP-STA-CONNECTED")) in line:
 		                        connectedDevice = line.split("AP-STA-CONNECTED ")[1]
-                                        # Taking time since last device connected, to end script after 60s
-                                        #newDeviceTime = time()
-                                        #if (newDeviceTime - thePreviousDeviceTime <= 60):
-                                        #        thePreviousDeviceTime = newDeviceTime
-                                        #        sys.exit()
+                                        time_last_connected_device = time.time()
 		                        print "Device connected with MAC: " + connectedDevice
 					print "Scanning " + connectedDevice
 				if (str("DHCP reply")) in line:
@@ -59,9 +63,28 @@ def scanParser():
 					else:
 						if str("group") in line:
 							print (mac+" is vulnerable to group key reinstallation")
+                                                        groupVulnMacIP.update({mac:ip})
 						else:
 							print (mac+" is vulnerable to pairwise")
-                                                        
+                                                        pairwiseVulnMacIP.update({mac:ip})
+                                if time.time() > time_last_connected_device + PERIOD_OF_TIME and time_last_connected_device > 0: break
+
+# THIS FUNCTION CAN PROBABLY BE DELETED!!  
+# Function to check if scanParser should continue, returns True if no device has connected
+# or if it has been less than 90 seconds since last device connected.
+def continue_scanning(time_last):
+                now = datetime.datetime.now()
+                now_in_seconds = int(time.mktime(now.timetuple()) * 1000)
+                if time_last is not None:
+                        if ((now_in_seconds - time_last) >= 90):
+                                # Scan has ran for more than 60 seconds since last connected devices. Stop scanParser and scan.
+                                return False
+                        else:
+                                # Continue scanning
+                                return True
+                else:
+                        # Continue scanning as no device has connected yet; to give users more time to connect the first device.
+                        return True
 
 def attackParser():
 	with open('./attackOutput.txt', 'r') as output:
