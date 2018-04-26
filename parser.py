@@ -51,6 +51,7 @@ def scanParser():
 					ip = (ip.split('to')[0]).strip()
 					pairMacIP.update({mac:ip})
 				if (str("vulnerable")) in line:
+					mac = (line.split(': ')[0])
 		                        if (str("DOESN'T")) in line:
 		                                if (str("group")) in line:
 							print (mac+" is not vulnerable to group key reinstallation")
