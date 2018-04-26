@@ -2,3 +2,5 @@
 *.pyc
 .gitignore*
 reports/
+*.pdf
+hwEncryptionDisabled

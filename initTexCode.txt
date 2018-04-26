@@ -1,8 +1,14 @@
+%TODO:
+%Edit description
+%Edit title format
+%Add exact time
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
 \title{KRACK+ vulnerability report}
+
 \centering
+
 \begin{document}
 \maketitle
 
