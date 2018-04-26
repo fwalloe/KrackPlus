@@ -4,15 +4,24 @@
 \title{KRACK+ vulnerability report}
 \centering
 \begin{document}
-
 \maketitle
-This document shows the results of KRACK+ vulnerability scan. 1st column shows devices' mac-addresses, 2nd column shows whether retransmission of message 3 is
-\newline \newline
+
+\begin{center}
+\textbf{Summary}
+\end{center}
+\begin{flushleft}
+\noindent An adversary can attempt to exploit a vulnerability in the 4-way handshake in WPA2 through jamming and resending the third part of the handshake. This report details whether any of the scanned Android or Linux devices are vulnerable to the pairwise or group version of key reinstallation attacks (KRACK). \newline
+
+\noindent The first column contains the mac-addresses of the clients that were scanned. The second and third colums detail whether a device was vulnerable to either the pairwise or group version of KRACK. \newline
+
+\noindent Pairwise: client seems vulnerable to pairwise key reinstallation in the 4-way handshake (using standard attack).\newline
+\noindent Group: client is vulnerable to group key reinstallations in the 4-way handshake (or client accepts replayed broadcast frames)\newline \newline
+\end{flushleft}
 
 \begin{center}
 \textbf{Device results}
 \end{center}
 
-\hspace{41mm} None \hspace{18mm} Re.Msg3 \hspace{16mm} Group
+\hspace{41mm} None \hspace{18mm} Parwise \hspace{16mm} Group
 \newline
 
