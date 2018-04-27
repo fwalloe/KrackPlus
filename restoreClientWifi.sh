@@ -2,6 +2,10 @@
 
 #This script should (aggressively) restore wifi to wireles interfaces after either scan or attack. 
 
+#TODO check if this helps
+#service networking restart
+#service network-manager restart
+
 systemctl start NetworkManager
 
 nmcli radio wifi off
