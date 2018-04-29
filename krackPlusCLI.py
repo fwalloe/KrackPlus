@@ -167,6 +167,7 @@ def main():
                 #subprocess.call(["./krackattacks-poc-zerokey/krackattack/enable_internet_forwarding.sh &"])
                 #subprocess.call(["sslstrip -w sslstrip.log &"])
 	
+		print("Open Wireshark to see traffic")
 		# User will only see relevant output, unless debug is on
 		if options.debug:
 			print("Debug enabled")
