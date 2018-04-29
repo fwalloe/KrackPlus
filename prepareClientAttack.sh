@@ -3,6 +3,17 @@
 # Install dependencies
 echo "Setting up dependencies..."
 
+# Checks whether dependencies are already installed; if not, installs them.
+while read packages; do
+	PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $packages | grep "install ok installed")
+	if [ "" == "$PKG_OK" ]; then
+		Package "echo $packages not found. Setting up $packages."
+		apt-get -y update
+		sudo apt-get --force-yes --yes install $packages > /dev/null
+	fi
+
+# Gets the list of dependencies from a file
+done <dependenciesClientScan
 
 # Set interface variables:
 wlan0=$(echo | ifconfig | sed 's/[ \t].*//;/^$/d' | awk "FNR==3" | tr -d ':')
