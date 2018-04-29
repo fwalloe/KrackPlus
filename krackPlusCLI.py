@@ -87,7 +87,7 @@ def main():
             if len(options.password) >= 8:
                 netCredentials.write(options.ssid + '\n' + options.password)
 	    else:
-                log.warn("Password length has to be longer than 8 characters, try again or don't specify password; default would be 'abcdefgh'.")
+                log.warn("Password length has to be longer than 8 characters, try again or don't specify password; the default password is 'abcdefgh'.")
                 sys.exit()
 	
 	# Attempt to launch scan, write output to file and display parsed output on screen
