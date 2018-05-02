@@ -105,7 +105,6 @@ def attackParser():
 				or str("Will create rogue AP") in line 
 				or str("Setting MAC address") in line
 				or str("Giving the rogue") in line
-				or str("Giving the rogue") in line
 				or str("Injecting Null frame so AP thinks") in line 
 				or str("injected Disassociation") in line
 				or str("2nd unique EAPOL msg3") in line
