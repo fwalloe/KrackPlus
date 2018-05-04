@@ -138,7 +138,7 @@ def main():
             subprocess.call(["./prepareClientAttack.sh"])         
             with open('./attackOutput.txt', 'w') as attackOutput:
 		
-		# Gives 
+		# Gives error if user attempts to combine pcap option with either debugging option.
 		if options.pcap and (options.dd or options.debug):		
 			raise KeyboardInterrupt("ERROR: cannot combine pcap with -d or --dd")
 			
