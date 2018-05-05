@@ -3,11 +3,12 @@
 #This script should (aggressively) restore wifi to wireles interfaces after either scan or attack. 
 
 #TODO check if this helps
-#service networking restart
 #service network-manager restart
 
-systemctl start NetworkManager
+sudo airmon-ng check kill >> /dev/null
 
+sudo service NetworkManager restart
+sudo service networking restart
 nmcli radio wifi off
 nmcli radio wifi on
 
@@ -54,4 +55,3 @@ fi
 #	fi
 #done
 
-# TODO check whether the wlan interfaces are back up; if not, advice user to remove their external NIC and click a button to run this script again. 
