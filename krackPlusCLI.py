@@ -11,8 +11,11 @@ import os
 import click
 from parser import *
 from multiprocessing import Process
-from colorlog import ColoredFormatter
 from subprocess import check_output
+
+# install colorlog if not already present on system
+subprocess.call(["./prepareKrackPlus.sh"])
+from colorlog import ColoredFormatter
 
 # For colored output
 LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
@@ -38,7 +41,7 @@ log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kris
 
 def main():
     USAGE = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
-    path = "~/krack/"
+    path = "~/krack/reports/"
     parser = optparse.OptionParser(usage=USAGE)
 
     # Getting interface name to be used as nic_mon automatically so user wont have to specify them
