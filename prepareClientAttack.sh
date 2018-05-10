@@ -28,12 +28,13 @@ else
 	exit
 fi
 
-# Replace hard-coded interface value in dnsmasq.conf
-sed -i 1s/.*/interface=$wlan0/ krackattacks-poc-zerokey/krackattack/dnsmasq.conf
-
 # Replace hard-coded interface values in enable_internet_forwarding.sh
 sed -i 5s/.*/INTERNET=$wlan0/ krackattacks-poc-zerokey/krackattack/enable_internet_forwarding.sh 
 sed -i 7s/.*/REPEATER=$wlan1/ krackattacks-poc-zerokey/krackattack/enable_internet_forwarding.sh 
+
+# Replace hard-coded interface value in dnsmasq.conf
+wlan0=$wlan0"mon"
+sed -i 1s/.*/interface=$wlan1/ krackattacks-poc-zerokey/krackattack/dnsmasq.conf
 
 # Make modified hostapd instance. Only needs to be done once
 if [[ ! -x "./krackattacks-poc-zerokey/hostapd/hostapd" ]] 
