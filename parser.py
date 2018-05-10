@@ -43,8 +43,76 @@ def scanParser():
                                         time_since_last_connected_device = time.time()
                                         number_of_connected_devices += 1 
 
-                                        print "Device connected with MAC: " + connectedDevice
-					print "Scanning " + connectedDevice
+    with open('./scanOutput.txt', 'r') as output:
+        mac = ''
+        ip = ''
+        pairMacIP = {mac:ip}
+        groupVulnMacIP = {mac:ip}
+        pairwiseVulnMacIP = {mac:ip}
+        counter = 0
+        #now = datetime.datetime.now()
+
+        time_last_connected_device = 0 
+        PERIOD_OF_TIME = 15 # 1.5min
+        number_of_connected_devices = 0
+        
+        # goes through the file line by line
+        while True:
+            time.sleep(0.5)
+			# Go through the file line by line, filter out interesting lines and parse them
+            for line in output.readlines():
+                if (str("]")) in line:
+                    line = line.split(']')[1]
+                if (str("AP-STA-CONNECTED")) in line:
+                    connectedDevice = line.split("AP-STA-CONNECTED ")[1]
+                    print "Device connected with MAC: " + connectedDevice
+                    print "Scanning " + connectedDevice
+                    #time_last_connected_device = time.time()
+                    #number_of_connected_devices += 1 
+                    #with click.progressbar(range(10000000), label="Scanning for KRACK vulnerabilities") as bar:
+                    #       for i in bar:
+                    #              pass
+                if (str("DHCP reply")) in line:
+                    mac = (line.split('DHCP')[0])
+                    mac = (str(mac).strip())[:-1]
+                    ip = line.split('reply')[1]
+                    ip = (ip.split('to')[0]).strip()
+                    pairMacIP.update({mac:ip})
+                if (str("vulnerable")) in line:
+                    mac = (line.split(': ')[0])
+                    if (str("DOESN'T")) in line:
+                        if (str("group")) in line:
+		            print (mac+" is not vulnerable to group key reinstallation")
+                        else:  
+			    print (mac+" is not vulnerable to pairwise")  
+                    else:
+                        if str("group") in line:
+                            print (mac+" is vulnerable to group key reinstallation")
+                            groupVulnMacIP.update({mac:ip})
+                        else:
+                            print (mac+" is vulnerable to pairwise")
+                            pairwiseVulnMacIP.update({mac:ip})
+				
+                        #if time.time() > time_last_connected_device + PERIOD_OF_TIME and time_last_connected_device > 0: break
+
+
+def writeParser():
+    with open('./scanOutput.txt', 'r') as output:
+        for line in output.readlines():
+            if (str("]")) in line:
+                line = line.split(']')[1]
+            if (str("DHCP reply")) in line:
+                mac = (line.split('DHCP')[0])
+                mac = (str(mac).strip())[:-1]
+                ip = line.split('reply')[1]
+                ip = (ip.split('to')[0]).strip()
+                pairMacIP.update({mac:ip})
+            if (str("vulnerable")) in line:
+                mac = (line.split(': ')[0])
+                if str("group") in line:
+                    groupVulnMacIP.update({mac:ip})
+                else:
+                    pairwiseVulnMacIP.update({mac:ip})
 
 				if (str("DHCP reply")) in line:
 		                        mac = (line.split('DHCP')[0])
@@ -70,7 +138,6 @@ def scanParser():
                                 if time.time() > time_since_last_connected_device + PERIOD_OF_TIME and time_since_last_connected_device > 0:
                                         should_continue = False
                                         exit
-
 
 def attackParser():
 	with open('./attackOutput.txt', 'r') as output:
@@ -117,6 +184,7 @@ def writeDictionary(dictionary, file):
 
     
 def writeResults():
+    writeParser()
     writeDictionary(pairMacIP, './scannedMacIP.txt')
     writeDictionary(pairwiseVulnMacIP, './pairwiseVulnMacIP.txt')
     writeDictionary(groupVulnMacIP, './groupVulnMacIP.txt')
