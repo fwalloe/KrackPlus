@@ -7,10 +7,9 @@ echo "Setting up dependencies..."
 while read packages; do
     PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $packages | grep "install ok installed")
 	if [ "" == "$PKG_OK" ]; then
-		Package "echo $packages not found. Setting up $packages."
-		apt-get -y update && apt-get install -y libnl-3-dev libnl-genl-3-dev pkg-config libssl-dev net-tools git sysfsutils python-scapy python-pycryptodome > /dev/null
-
-		sudo apt-get --force-yes --yes install $packages
+		echo "$packages not found. Setting up $packages."
+		apt-get -y update > /dev/null
+		sudo apt-get --force-yes --yes install $packages > /dev/null
 	fi
 
 # Gets the list of dependencies from a file
