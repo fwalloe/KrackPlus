@@ -5,5 +5,4 @@
 ###
 
 process=$(ps | grep $1 | awk '{print $1}')
-echo $process
-kill -9 $process
+kill -9 $process > /dev/null
