@@ -86,7 +86,7 @@ def main():
             subprocess.call(["./prepareClientScan.sh"])
             log.info("Running KRACK+ Scan:")
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
-            log.warn("Press 'ctrl-c' to end/abort scan and generate PDF of findings.")
+            log.warn("Wait for the scan to finish or press 'ctrl-c' to end/abort scan and generate PDF of current findings.")
       	    with open('./scanOutput.txt', 'w') as scanOutput:
 		if options.scan and options.debug:
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], shell=True)
@@ -94,8 +94,9 @@ def main():
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --debug"], shell=True)
 		else:
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-            	    scanParser() 
-    
+            	    scanParser()
+                    raise KeyboardInterrupt 
+                    
         except(KeyboardInterrupt, SystemExit):
 		subprocess.call(["clear"], shell=True)
                 with click.progressbar(range(50000), label="Cleaning up and generating PDF") as bar:
