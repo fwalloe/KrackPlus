@@ -130,7 +130,9 @@ def writeDictionary(dictionary, file):
                 MacIP.write(value + '\n')
     MacIP.closed
 
-# 
+# Writes the results of the scan to files
+## it calls the writeParser to ensure that the hashmaps contain the results 
+## then it calls writeDictionary three times to write the three hashmaps to three separate files 
 def writeResults():
     writeParser()
     writeDictionary(pairMacIP, './scannedMacIP.txt')
