@@ -7,3 +7,55 @@
 		sudo nmcli radio wifi off
 		sudo rfkill unblock wifi
 		or sudo airmon-ng check kill
+
+
+
+
+
+
+
+
+
+
+
+
+3. when error in prepare client attack:
+    attack.run(strict_echo_test=args.strict_echo_test)
+  File "./krack-all-zero-tk.py", line 880, in run
+    self.configure_interfaces()
+  File "./krack-all-zero-tk.py", line 850, in configure_interfaces
+    subprocess.check_output(["ifconfig", self.nic_real, "down"])
+  File "/usr/lib/python2.7/subprocess.py", line 223, in check_output
+    raise CalledProcessError(retcode, cmd, output=output)
+subprocess.CalledProcessError: Command '['ifconfig', 'wlan1', 'down']' returned non-zero exit status 255
+[16:48:21] Closing hostapd and cleaning up ...
+
+4. when keeping external NIC and target too close
+[19:58:30] Note: keep >1 meter between both interfaces. Else packet delivery is unreliable & target may disconnect
+[ERROR] Could not change MAC: interface up or insufficient permissions: Device or resource busy
+Traceback (most recent call last):
+  File "./krack-all-zero-tk.py", line 1018, in <module>
+    attack.run(strict_echo_test=args.strict_echo_test)
+  File "./krack-all-zero-tk.py", line 880, in run
+    self.configure_interfaces()
+  File "./krack-all-zero-tk.py", line 868, in configure_interfaces
+    call_macchanger(self.nic_real_clientack, self.clientmac)
+  File "./krack-all-zero-tk.py", line 143, in call_macchanger
+    subprocess.check_output(["macchanger", "-m", macaddr, iface])
+  File "/usr/lib/python2.7/subprocess.py", line 223, in check_output
+    raise CalledProcessError(retcode, cmd, output=output)
+subprocess.CalledProcessError: Command '['macchanger', '-m', '54:27:58:63:14:aa', 'wlan1sta1']' returned non-zero exit status 1
+[19:58:31] Closing hostapd and cleaning up ...
+
+5. failure to run prepare script (airmon and unblock) 
+Traceback (most recent call last):
+  File "./krack-all-zero-tk.py", line 1018, in <module>
+    attack.run(strict_echo_test=args.strict_echo_test)
+  File "./krack-all-zero-tk.py", line 929, in run
+    self.hostapd_ctrl = Ctrl("hostapd_ctrl/" + self.nic_rogue_ap)
+  File "/root/krackattacks-poc-zerokey/krackattack/wpaspy.py", line 49, in __init__
+    socket.SOCK_DGRAM)
+socket.gaierror: [Errno -2] Name or service not known
+[19:59:36] Closing hostapd and cleaning up ...
+
+

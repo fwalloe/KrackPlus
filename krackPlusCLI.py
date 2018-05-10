@@ -11,8 +11,11 @@ import os
 import click
 from parser import *
 from multiprocessing import Process
-from colorlog import ColoredFormatter
 from subprocess import check_output
+
+# install colorlog if not already present on system
+subprocess.call(["./prepareKrackPlus.sh"])
+from colorlog import ColoredFormatter
 
 # For colored output
 LOGFORMAT = "%(log_color)s%(message)s%(reset)s"
@@ -24,12 +27,12 @@ stream.setLevel(LOG_LEVEL)
 stream.setFormatter(formatter)
 log = logging.getLogger('pythonConfig')
 log.setLevel(LOG_LEVEL)
-log.addHandler(stream)
+log.addHandler(stream) 
 
 ########   Examples which gives dirrent colored output    #################
 #log.debug("A quirky message only developers care about")             WHITE
 #log.info("Curious users might want to know this")                    GREEN
-#log.warn("Something is wrong and any user should be informed")       YELLOW
+#log.warn("Something is wrong and all users should be informed")       YELLOW
 #log.error("Serious stuff, this is red for a reason")                 RED
 #log.critical("OH NO everything is on fire")                          SUPER RED/ORANGE
 
@@ -38,26 +41,15 @@ log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kris
 
 def main():
     USAGE = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
-    path = "~/krack/"
+    path = 'reports/'
     parser = optparse.OptionParser(usage=USAGE)
-
-    # Getting interface name to be used as nic_mon automatically so user wont have to specify them
-    process = subprocess.Popen(["ifconfig", "|", "sed 's/[ \t].*//;/^$/d'", "|", " awk 'FNR==3'", "|", "tr", "-d" "':"], stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    nic_mon = out
-    # Getting interface name to be used as nic_rogue automatically so user wont have to specify them    
-    process = subprocess.Popen(["ifconfig", "|", "sed 's/[ \t].*//;/^$/d'", "|", " awk 'FNR==4'", "|", "tr", "-d" "':"], stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    nic_rogue = out
-
-        
     # KRACK+ Attack options
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
     parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
     parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
-    parser.add_option('--nic-mon', default=nic_mon,  help="This option is used to specify Wireless monitor interface that will listen on the"
+    parser.add_option('--nic-mon', help="This option is used to specify Wireless monitor interface that will listen on the"
                         "channel of the target AP. Should be your secondary NIC, i.e USB NIC.", dest='mon')
-    parser.add_option('--nic-rogue-ap', default=nic_rogue, help="This option is used to specify Wireless monitor interface that will run a rogue AP"
+    parser.add_option('--nic-rogue-ap', help="This option is used to specify Wireless monitor interface that will run a rogue AP"
                         "using a modified hostapd.", dest='rogue')
     parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap')
 
@@ -95,7 +87,7 @@ def main():
             subprocess.call(["./prepareClientScan.sh"])
             log.info("Running KRACK+ Scan:")
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
-            log.warn("Press 'ctrl-c' to end/abort scan and generate PDF of findings. Scan will automatically end when scan is complete.")
+            log.warn("Press 'ctrl-c' to end/abort scan and generate PDF of findings.")
       	    with open('./scanOutput.txt', 'w') as scanOutput:
 		if options.scan and options.debug:
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], shell=True)
@@ -107,7 +99,7 @@ def main():
     
         except(KeyboardInterrupt, SystemExit):
 		subprocess.call(["clear"], shell=True)
-                with click.progressbar(range(100000), label="Cleaning up and generating PDF") as bar:
+                with click.progressbar(range(50000), label="Cleaning up and generating PDF") as bar:
                     for i in bar:
                         pass
                 subprocess.call(["./restoreClientWifi.sh"])
@@ -138,7 +130,7 @@ def main():
             subprocess.call(["./prepareClientAttack.sh"])         
             with open('./attackOutput.txt', 'w') as attackOutput:
 		
-		# Gives 
+		# Gives error if user attempts to combine pcap option with either debugging option.
 		if options.pcap and (options.dd or options.debug):		
 			raise KeyboardInterrupt("ERROR: cannot combine pcap with -d or --dd")
 			
@@ -153,7 +145,7 @@ def main():
 			# Saves pcap from attack to file. 
 			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " --dump " + options.pcap + " &"], stdout=attackOutput, shell=True)
-			source=os.listdir("./krackattacks-poc-zerokey/krackattack/")
+			source=os.listdir("krackattacks-poc-zerokey/krackattack/")
 			destination="reports/"
 			for files in source:
 				if files.endswith(".pcap"):
@@ -180,11 +172,12 @@ def main():
             log.info("Cleaning up and restoring wifi ...")
 	    subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
-	#except:
-	#    subprocess.call(["clear"], shell=True)
-        #    log.info("Error occurred. Restoring wifi ...")
-        #    subprocess.call(["rm attackOutput.txt"], shell=True)
-        #    subprocess.call(["./restoreClientWifi.sh"])
+
+	except:
+	    subprocess.call(["clear"], shell=True)
+            log.info("Error occurred. Restoring wifi ...")
+            subprocess.call(["rm attackOutput.txt"], shell=True)
+            subprocess.call(["./restoreClientWifi.sh"])
 
     ############# RESTORE INTERNET ################        
     elif options.restore:
