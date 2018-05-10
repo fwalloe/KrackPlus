@@ -51,8 +51,6 @@ if ! cat hwEncryptionDisabled | grep -q '1';
 then 
 	echo "About to disable hardware encryption for NIC; this only needs to be done once"
 	./findVulnerable/krackattack/disable-hwcrypto.sh
-else 
-	echo ""
 fi
 
 #Disable network, but ensure the script can still use wifi

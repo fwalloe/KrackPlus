@@ -33,8 +33,6 @@ nmcli radio wifi off
 if ! cat hwEncryptionDisabled | grep -q '1';
 then 
 	./findVulnerable/krackattack/disable-hwcrypto.sh
-else 
-	echo "Hardware Encryption already disabled"
 fi
 
 # Replace default password if user requests it
