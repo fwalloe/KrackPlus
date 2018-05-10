@@ -157,6 +157,7 @@ def writeDocument():
             if (mac != ' '):
                 writeElement(report, mac, count)
                 count += 1
+	report.write('If KrackPlus lists a patched device as vulnerable, this likely means that the device contains a bug that allows for replayed broadcast and multicast frames.')
         report.write('\end{document}')
     report.close()
 
