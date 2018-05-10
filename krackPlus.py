@@ -40,7 +40,7 @@ log.debug("KRACK+ is a tool to scan for and exploit the KRACK vulnerability in W
 log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
 def main():
-    USAGE = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
+    USAGE = "\nKRACK+ Scan:   ./krackPlus.py [-s]\n\t       ./krackPlus.py [-s] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKRACK+ Attack: ./krackPlus.py [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
     path = 'reports/'
     parser = optparse.OptionParser(usage=USAGE)
 
