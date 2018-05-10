@@ -7,8 +7,8 @@ echo "Setting up dependencies..."
 while read packages; do
 	PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $packages | grep "install ok installed")
 	if [ "" == "$PKG_OK" ]; then
-		Package "echo $packages not found. Setting up $packages."
-		apt-get -y update
+		echo "$packages not found. Setting up $packages."
+		apt-get -y update > /dev/null
 		sudo apt-get --force-yes --yes install $packages > /dev/null
 	fi
 
