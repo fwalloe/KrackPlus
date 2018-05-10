@@ -36,24 +36,13 @@ log.addHandler(stream)
 #log.error("Serious stuff, this is red for a reason")                 RED
 #log.critical("OH NO everything is on fire")                          SUPER RED/ORANGE
 
-log.debug("KRACK+ is a tool to scan for and exploit the KRACK vulnerability in WPA2, discovered by Mathy Vanhoef.")
-log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
+log.debug("KrackPlus is a tool to scan for and exploit the KRACK vulnerability in WPA2(CVE-2017-13077 & CVE-2017-13080), discovered by Mathy Vanhoef.")
+log.debug("KrackPlus 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
 def main():
-    USAGE = "\nKRACK+ Scan:   ./krackPlus.py [-s]\n\t       ./krackPlus.py [-s] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKRACK+ Attack: ./krackPlus.py [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
+    USAGE = "\nKrackPlus Scan:   ./krackPlus.py [-s]\n\t          ./krackPlus.py [-s] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKrackPlus Attack: ./krackPlus.py [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
     path = 'reports/'
     parser = optparse.OptionParser(usage=USAGE)
-
-    # KRACK+ Attack options
-    parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
-    parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
-    parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
-    parser.add_option('--nic-mon', help="This option is used to specify Wireless monitor interface that will listen on the"
-                        "channel of the target AP. Should be your secondary NIC, i.e USB NIC.", dest='mon')
-    parser.add_option('--nic-rogue-ap', help="This option is used to specify Wireless monitor interface that will run a rogue AP"
-                        "using a modified hostapd.", dest='rogue')
-    parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap')
-
 
     # KRACK+ Scan options
     parser.add_option('--scan','-s', help="This option will create a network with SSID 'testnetwork' where the default password is 'abcdefgh'."
@@ -63,6 +52,15 @@ def main():
                       " Password length has to be 8 characters or more!", dest='password')
     parser.add_option('--path', '-p', help="Set path where scan report should be saved", dest='path')
 
+ # KRACK+ Attack options
+    parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
+    parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
+    parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
+    parser.add_option('--nic-mon', help="This option is used to specify Wireless monitor interface that will listen on the"
+                        "channel of the target AP. Should be your secondary NIC, i.e USB NIC.", dest='mon')
+    parser.add_option('--nic-rogue-ap', help="This option is used to specify Wireless monitor interface that will run a rogue AP"
+                        "using a modified hostapd.", dest='rogue')
+    parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap') 
 
     # General KRACK+ options:
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
