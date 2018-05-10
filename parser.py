@@ -45,7 +45,7 @@ def scanParser():
                                         time_last_connected_device = time.time()
                                         number_of_connected_devices += 1 
                                         print "Device connected with MAC: " + connectedDevice
-					print "Scanning " + connectedDevice + ":"
+					print "Scanning " + connectedDevice
 
                                         #with click.progressbar(range(10000000), label="Scanning for KRACK vulnerabilities") as bar:
                                          #       for i in bar:
