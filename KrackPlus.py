@@ -36,16 +36,6 @@ log.addHandler(stream)
 #log.error("Serious stuff, this is red for a reason")                 RED
 #log.critical("OH NO everything is on fire")                          SUPER RED/ORANGE
 
-
-I  Members must use four spaces rather than tab
-II  Comments must be in English
-III  CONST must be all capital letters
-IV  Spaces between operator signs:  A + B rather than A+B
-V  Comments must be on the line above
-VI  When introducing only air, only use one page-shift
-VII  Between functions, two page-shifts
-VIII  Between classes and functions, three page-shifts
-
 log.debug("KrackPlus is a tool to scan for and exploit the KRACK vulnerability in WPA2(CVE-2017-13077 & CVE-2017-13080), discovered by Mathy Vanhoef.")
 log.debug("KrackPlus 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
