@@ -5,8 +5,8 @@ This projects provides user interface to run KRACK scans and attempts to automat
 
 ## Contributors ##
 Lars Trinborgholen
-Lars MÃ¦hlum
-Fredrik WallÃ¸e
+Lars Kristian Mæhlum
+Fredrik Walløe
 
 
 ## Files ##
