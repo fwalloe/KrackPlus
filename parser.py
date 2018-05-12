@@ -12,18 +12,12 @@ import click
 # global variables
 mac = ''
 ip = ''
-pairMacIP = {mac: ip}
-groupVulnMacIP = {mac: ip}
-pairwiseVulnMacIP = {mac: ip}
 
 # parses the output of a scan to display only key information to user
 def scanParser():
     with open('./scanOutput.txt', 'r') as output:
         mac = ''
         ip = ''
-        pairMacIP = {mac:ip}
-        groupVulnMacIP = {mac:ip}
-        pairwiseVulnMacIP = {mac:ip}
         counter = 0
         time_since_last_connected_device = 0
         PERIOD_OF_TIME = 90 # 1.5min
@@ -48,12 +42,14 @@ def scanParser():
                 if (str("DHCP reply")) in line:
                     mac = (line.split('DHCP')[0])
                     mac = (str(mac).strip())[:-1]
+                    mac = mac.lstrip()
                     ip = line.split('reply')[1]
                     ip = (ip.split('to')[0]).strip()
-                    pairMacIP.update({mac:ip})
 
                 if (str("vulnerable")) in line:
                     mac = (line.split(': ')[0])
+                    mac = str(mac)
+                    mac = mac.lstrip()
                     if (str("DOESN'T")) in line:
                         if (str("group")) in line:
 		                    print (mac+" is not vulnerable to group key reinstallation")
@@ -62,37 +58,14 @@ def scanParser():
                     else:
                         if str("group") in line:
                             print (mac+" is vulnerable to group key reinstallation")
-                            groupVulnMacIP.update({mac:ip})
                         else:
                             print (mac+" is vulnerable to pairwise")
-                            pairwiseVulnMacIP.update({mac:ip})
 
                 if time.time() > time_since_last_connected_device + PERIOD_OF_TIME and time_since_last_connected_device > 0:
                     should_continue = False
+                    print ("Scan will now exit as " + PERIOD_OF_TIME + " seconds have passed since the last device connected to the test network")
                     exit
-               
-# writeParser parses the same file as scanParser, but does not output anything to screen. Used to fill hashmaps to generate report of scan results.
-def writeParser():
-    mac = ''
-    ip = ''
-    with open('./scanOutput.txt', 'r') as output:
-        for line in output.readlines():
-            if (str("]")) in line:
-                line = line.split(']')[1]
-            if (str("DHCP reply")) in line:
-                mac = (line.split('DHCP')[0])
-                mac = (str(mac).strip())[:-1]
-                ip = line.split('reply')[1]
-                ip = (ip.split('to')[0]).strip()
-                pairMacIP.update({mac:ip})
-            if (str("vulnerable")) in line:
-                if (str("DOESN'T")) not in line:
-                    mac = (line.split(': ')[0])
-                    if str("group") in line:
-                        groupVulnMacIP.update({mac:ip})
-                    else:
-                        pairwiseVulnMacIP.update({mac:ip})
-
+              
 # parses output during an attack 
 def attackParser():
 	with open('./attackOutput.txt', 'r') as output:
@@ -120,30 +93,39 @@ def attackParser():
 				or str("hostapd") in line ):
 					print line
 
-# NOT IN USE		
-def printDictionary(dictionary):
-    # Prints everything in the dictionary.
-    for key, value in dictionary.iteritems():
-        if key != '' and value != '':
-                print "Key: " + key + " has value: " + value
-
-# writes results of a scan to files, in order to generate report     
-def writeDictionary(dictionary, file):
-    with open(file, 'w') as MacIP:
-        # Prints the dictionary to file
-        for key, value in dictionary.iteritems():
-            if key != '' and value != '':
-                MacIP.write(key + '\n')
-                MacIP.write(value + '\n')
-    MacIP.closed
-
 # Writes the results of the scan to files
 ## it calls the writeParser to ensure that the hashmaps contain the results 
 ## then it calls writeDictionary three times to write the three hashmaps to three separate files 
-def writeResults():
-    writeParser()
-    writeDictionary(pairMacIP, './scannedMacIP.txt')
-    writeDictionary(pairwiseVulnMacIP, './pairwiseVulnMacIP.txt')
-    writeDictionary(groupVulnMacIP, './groupVulnMacIP.txt')
 
+# writeParser parses the same file as scanParser, but does not output anything to screen. Used to fill hashmaps to generate report of scan results.
+def writeResults():
+    mac = ''
+    ip = ''
+    with open('./scanOutput.txt', 'r') as output:
+        vulnToPairwise = {mac:ip}
+        for line in output.readlines():
+            if (str("]")) in line:
+                line = line.split(']')[1]
+            if (str("DHCP reply")) in line:
+                mac = (line.split('DHCP')[0])
+                mac = (str(mac).strip())[:-1]
+                mac = mac.lstrip()
+                ip = line.split('reply')[1]
+                ip = (ip.split('to')[0]).strip()
+                with open('./allScanned.txt', 'w') as allScanned:
+                    allScanned.write(mac + '\n')
+                    allScanned.write('1.1.1.1' + '\n')
+            if (str("vulnerable")) in line:
+                if (str("DOESN'T")) not in line:
+                    mac = (line.split(': ')[0])
+                    mac = mac.lstrip()
+                    if str("group") in line:
+                        with open('./vulnToGroup.txt', 'w') as group:
+                            group.write(mac + '\n')
+                            group.write('2.2.2.2' + '\n')
+                    if str ("pairwise") in line:
+                        ip="192.168.10.10" #TODO refactor to remove this
+                        with open('./vulnToPairwise.txt', 'w') as pairwise:
+                            pairwise.write(mac + '\n')
+                            pairwise.write('3.3.3.3' + '\n')
 
