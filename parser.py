@@ -61,10 +61,10 @@ def scanParser():
                         else:
                             print (mac+" is vulnerable to pairwise")
 
-                if time.time() > time_since_last_connected_device + PERIOD_OF_TIME and time_since_last_connected_device > 0:
-                    print ("Scan will now exit as " + PERIOD_OF_TIME + " seconds have passed since the last device connected to the test network") 
-                    exit                   
-                    #should_continue = False
+                # if no new devices have connected for 1.5 minutes, stop the scan. 
+                if time.time() > (time_since_last_connected_device + PERIOD_OF_TIME) and time_since_last_connected_device > 0:
+                    print ("Scan will now exit as " + PERIOD_OF_TIME + " seconds have passed since the last device connected to the test network")                     
+                    should_continue = False
                   
                  
 # parses output during an attack 
