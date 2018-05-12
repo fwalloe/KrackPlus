@@ -26,5 +26,5 @@ iptables -t nat -A PREROUTING -p tcp --destination-port 80 -j REDIRECT --to-port
 echo "[ ] Starting DHCP and DNS service"
 
 echo ""
-dnsmasq -d -C dnsmasq.conf > /dev/null
+#dnsmasq -d -C dnsmasq.conf --quiet-dhcp --quiet-dhcp6 --quiet-ra > /dev/null
 
