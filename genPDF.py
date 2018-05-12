@@ -19,7 +19,7 @@ pdf_name = "./krackPlus-vulnerability-report_" + str(now.day) \
 # from the scan output parser
 # The format of the text can be found in the Latex code in the raw report file
 
-#from parser import pairMacIP, pairwiseVulnMacIP, groupVulnMacIP
+#from parser import pairMacIP, vulnToPairwise, vulnToGroup
 
 # Test block
 # Should bo commented when functional. Uncomment the import above.
@@ -32,8 +32,8 @@ path = sys.argv[1] if len(sys.argv) > 1 else "./reports/"
 ip = ' '
 mac = ' '
 pairMacIP = {mac:ip}
-pairwiseVulnMacIP = {mac:ip}
-groupVulnMacIP = {mac:ip}
+vulnToPairwise = {mac:ip}
+vulnToGroup = {mac:ip}
 
 def addData():
     ip = '192.168.1.1'
@@ -43,12 +43,12 @@ def addData():
     ip = '192.168.1.2'
     mac = '3333.aaaa.1111.2222'
     pairMacIP.update({mac:ip})
-    pairwiseVulnMacIP.update({mac:ip})
+    vulnToPairwise.update({mac:ip})
 
     ip = '192.168.1.3'
     mac = '4444.aaaa.1111.2222'
     pairMacIP.update({mac:ip})
-    groupVulnMacIP.update({mac:ip})
+    vulnToGroup.update({mac:ip})
 
     ip = '192.168.1.4'
     mac = '5555.aaaa.1111.2222'
@@ -69,10 +69,9 @@ def getParserData():
     counter = 1
 
     # looks for MAC-addresses
-    with open('./scannedMacIP.txt', 'r') as MACIP:
+    with open('./allScanned.txt', 'r') as MACIP:
         for line in MACIP:
             if (line != ' '):
-                print "all"
                 if (counter % 2 == 1):
                     mac = line.rstrip()
                 else:
@@ -83,29 +82,27 @@ def getParserData():
 
     counter = 1
 
-    with open('./pairwiseVulnMacIP.txt', 'r') as MACIP:
+    with open('./vulnToPairwise.txt', 'r') as MACIP:
         for line in MACIP:
             if (line != ' '):
-                print "pairwise"
                 if (counter % 2 == 1):
                     mac = line.rstrip()
                 else:
                     ip = line.rstrip()
-                    pairwiseVulnMacIP.update({mac:ip})
+                    vulnToPairwise.update({mac:ip})
                 counter += 1
     MACIP.closed
 
     counter = 1
 
-    with open('./groupVulnMacIP.txt', 'r') as MACIP:
+    with open('./vulnToGroup.txt', 'r') as MACIP:
         for line in MACIP:
             if (line != ' '):
-                print "group"
                 if (counter % 2 == 1):
                     mac = line.rstrip()
                 else:
                     ip = line.rstrip()
-                    groupVulnMacIP.update({mac:ip})
+                    vulnToGroup.update({mac:ip})
                 counter += 1
     MACIP.closed
 
@@ -127,22 +124,22 @@ def getSpaces(n):
 # "count" is just a number used to index them in the report
 def writeElement(report, mac, count):
 
-    writeValue(report, mac + ':' + getSpaces(10))
+    writeValue(report, mac + ':' + getSpaces(14))
 
-    if pairwiseVulnMacIP.get(mac) is None and groupVulnMacIP.get(mac) is None:
+    if vulnToPairwise.get(mac) is None and vulnToGroup.get(mac) is None:
         writeValue(report, 'x')
     else:
         writeValue(report, getSpaces(1))
     writeValue(report, getSpaces(29))
 
-    if (pairwiseVulnMacIP.get(mac)) is not None:
-        writeValue(report, 'pair')
+    if (vulnToPairwise.get(mac)) is not None:
+        writeValue(report, 'x')
     else:
         writeValue(report, getSpaces(1))
     writeValue(report, getSpaces(29))
 
-    if (groupVulnMacIP.get(mac)) is not None:
-        writeValue(report, 'group')
+    if (vulnToGroup.get(mac)) is not None:
+        writeValue(report, 'x')
     else:
         writeValue(report, getSpaces(1))
     writeValue(report, getSpaces(29))
@@ -164,8 +161,8 @@ def writeDocument():
             if (mac != ' '):
                 writeElement(report, mac, count)
                 count += 1
-
-	report.write('If KrackPlus lists a patched device as vulnerable, this likely means that the device contains a bug that allows for replayed broadcast and multicast frames.')
+        report.write('\nIf KrackPlus lists a patched device as vulnerable, this likely means that the device contains a bug that allows for replayed broadcast and multicast frames.')
+        report.write("\nNote also that if a device is vulnerable to the all-zero pairwise key reinstallation that affects Android 6.0 and Linux with wpa\_supplicant 2.3-2.6, the scan may fail to accurately gauge whether the device is vulnerable to key reinstallation attacks against the Group Key Handshake. Run KrackPlus with the --group option to test only the Group Handshake.")
         report.write('\end{document}')
     report.close()
 
