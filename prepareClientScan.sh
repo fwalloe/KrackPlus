@@ -1,5 +1,10 @@
 #!/bin/bash
 
+##
+# prepareClientScan.sh handles dependencies for KrackPlus Scan
+##
+
+
 # Installs dependencies
 echo "Setting up dependencies..."
 

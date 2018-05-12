@@ -1,5 +1,9 @@
 #!/bin/bash
 
+##
+# prepareClientAttack.sh handles dependencies for KrackPlus Attack
+##
+
 # Install dependencies
 echo "Setting up dependencies..."
 
