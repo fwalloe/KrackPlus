@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-# This script prints text to the reportTemplate.tex file
+##
+# genPDF.py creates a PDF-report that shows the results of KrackPlus Scan
+##
 
 import subprocess
 import re
@@ -62,12 +64,15 @@ def addData():
 def newline():
     return '\\newline'
 
+# Parses data from three files to get the MAc-addresses of all clients seen during the scan, and whether they are vulnerable 
 def getParserData():
     counter = 1
 
+    # looks for MAC-addresses
     with open('./scannedMacIP.txt', 'r') as MACIP:
         for line in MACIP:
             if (line != ' '):
+                print "all"
                 if (counter % 2 == 1):
                     mac = line.rstrip()
                 else:
@@ -81,6 +86,7 @@ def getParserData():
     with open('./pairwiseVulnMacIP.txt', 'r') as MACIP:
         for line in MACIP:
             if (line != ' '):
+                print "pairwise"
                 if (counter % 2 == 1):
                     mac = line.rstrip()
                 else:
@@ -94,6 +100,7 @@ def getParserData():
     with open('./groupVulnMacIP.txt', 'r') as MACIP:
         for line in MACIP:
             if (line != ' '):
+                print "group"
                 if (counter % 2 == 1):
                     mac = line.rstrip()
                 else:
@@ -129,13 +136,13 @@ def writeElement(report, mac, count):
     writeValue(report, getSpaces(29))
 
     if (pairwiseVulnMacIP.get(mac)) is not None:
-        writeValue(report, 'x')
+        writeValue(report, 'pair')
     else:
         writeValue(report, getSpaces(1))
     writeValue(report, getSpaces(29))
 
     if (groupVulnMacIP.get(mac)) is not None:
-        writeValue(report, 'x')
+        writeValue(report, 'group')
     else:
         writeValue(report, getSpaces(1))
     writeValue(report, getSpaces(29))
@@ -157,6 +164,7 @@ def writeDocument():
             if (mac != ' '):
                 writeElement(report, mac, count)
                 count += 1
+
 	report.write('If KrackPlus lists a patched device as vulnerable, this likely means that the device contains a bug that allows for replayed broadcast and multicast frames.')
         report.write('\end{document}')
     report.close()
