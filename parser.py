@@ -1,5 +1,9 @@
 #!/bin/python
 
+##
+# parser.py parses output from KrackPlus Scan and Attack. Also involved in the creation of vulnerability reports. 
+##
+
 import re	# used for regular expressions 
 import datetime, time
 import subprocess
@@ -69,6 +73,8 @@ def scanParser():
                
 # writeParser parses the same file as scanParser, but does not output anything to screen. Used to fill hashmaps to generate report of scan results.
 def writeParser():
+    mac = ''
+    ip = ''
     with open('./scanOutput.txt', 'r') as output:
         for line in output.readlines():
             if (str("]")) in line:
@@ -80,11 +86,12 @@ def writeParser():
                 ip = (ip.split('to')[0]).strip()
                 pairMacIP.update({mac:ip})
             if (str("vulnerable")) in line:
-                mac = (line.split(': ')[0])
-                if str("group") in line:
-                    groupVulnMacIP.update({mac:ip})
-                else:
-                    pairwiseVulnMacIP.update({mac:ip})
+                if (str("DOESN'T")) not in line:
+                    mac = (line.split(': ')[0])
+                    if str("group") in line:
+                        groupVulnMacIP.update({mac:ip})
+                    else:
+                        pairwiseVulnMacIP.update({mac:ip})
 
 # parses output during an attack 
 def attackParser():
