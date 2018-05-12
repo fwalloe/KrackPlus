@@ -20,7 +20,7 @@ then
  	ifconfig wlan0mon down > /dev/null
 fi
 
-if (ifconfig | sed 's/[ \t].*//;/^$/d' | awk "FNR==3" | tr -d ':' | grep --quiet wlan0sta1)
+if (ifconfig | sed 's/[ \t].*//;/^$/d' | awk "FNR==5" | tr -d ':' | grep --quiet wlan0sta1)
 then
  	ifconfig wlan0sta1 down > /dev/null
 fi
