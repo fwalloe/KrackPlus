@@ -257,6 +257,10 @@ def main():
         log.warn("Scan and attack cannot be run simultaneously. Please specify either [-a] or [-s].")
         parser.print_help()
 
+    elif options.attack and options.group:
+        log.warn("Attack against the group key-handshake specifically, is not implemented. Please see usage below and try again!")
+        parser.print_help()
+
     ######## NO OPTION GIVEN #########
     else:
         log.warn("No option was given or there were missing arguments, please see usage below and try again!")
