@@ -5,7 +5,7 @@ KrackPlus seeks to handle dependencies and parse the output from two scripts mad
 Users can run a scan or an attack with a single command – all dependencies are handled in the background. 
 
 ## Contributors ##
-Lars Trinborgholen
+Lars Magnus Trinborgholen
 Lars Kristian Mæhlum
 Fredrik Walløe
 
