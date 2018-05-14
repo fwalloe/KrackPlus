@@ -11,20 +11,20 @@ Fredrik Walløe
 
 ## Usage ###
 
-Run KrackPlus.py to see a usage guide
+Run KrackPlus.py to see a usage guide.
 
 ## Files ##
-KrackPlus.py: graphical user interface for KrackPlus
+KrackPlus.py: graphical user interface for KrackPlus.
 
 prepareKrackPlus.sh: installs dependencies needed to run KrackPlus.
 
-prepareClientScan.sh: installs prerequisites necessary to run set up a network that check whether devices that connect to it are vulnerable
+prepareClientScan.sh: installs prerequisites necessary to run set up a network that check whether devices that connect to it are vulnerable.
 
 prepareClientAttack.sh. handles prerequsites necessary to run the attack script. 
 
 reportTemplate.tex: a LaTeX template used to generate reports after vulnerability scans. Scan results are pushed to this file, which is compiled into a .pdf. 
 
-restoreClientWifi.sh: attempts to restore client WIFI after an attack or scan
+restoreClientWifi.sh: attempts to restore client WIFI after an attack or scan.
 
 parser.py: parses output from either scan or attack and displays appropriate output to user.
 
@@ -34,4 +34,6 @@ dependenciesClientScan: contains a list of dependencies. Used by the prepareClie
 
 killProcesses: kills processes that run in the background (dnsmasq and, optionally, sslstrip).
 
+generatePDF.py: creates a PDF report that contains scan results.
 
+displayInterfaces.sh: finds and displays the names of the user's NICs as part of the usage guide. 
