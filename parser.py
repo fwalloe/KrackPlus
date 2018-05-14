@@ -102,6 +102,7 @@ def attackParser():
 def writeResults():
     mac = ''
     ip = ''
+    subprocess.call(["touch allScanned.txt vulnToPairwise.txt vulnToGroup.txt"], shell=True)
     with open('./scanOutput.txt', 'r') as output:
         vulnToPairwise = {mac:ip}
         for line in output.readlines():
