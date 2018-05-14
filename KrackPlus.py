@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+#CREATED BY Lars Magnus Trinborgholen, Fredrik Walloe & Lars Kristian Maehlum
 import sys
 import optparse
 import subprocess
