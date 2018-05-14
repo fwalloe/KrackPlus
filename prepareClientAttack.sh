@@ -26,7 +26,7 @@ wlan1=$(echo | ifconfig | sed 's/[ \t].*//;/^$/d' | awk "FNR==4" | tr -d ':')
 # Verify that users have sufficient number of wireless interfaces
 if [[ $wlan0 = *"w"* && $wlan1 = *"w"* ]];
 then
-	echo "Found $wlan0 and $wlan1"
+	echo ""
 else
 	echo "Error: insufficient wireless interfaces found. You need an external NIC in addition to your internal NIC."
 	exit
