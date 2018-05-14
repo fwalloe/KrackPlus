@@ -24,17 +24,23 @@ done <dependenciesClientScan
 if [[ ! -x "./findVulnerable/hostapd/hostapd" ]] 
 then 
 	echo "Compiling hostapd"
-	cd ./findVulnerable/hostapd/
+	cd ./findVulnerable/hostapd/ 
 	cp defconfig .config 
-	make -j 2 1>/dev/null
+	make -j 2 1> /dev/null
 	cd ../../
 fi
 
 # Disables network
 nmcli radio wifi off
 
+# Make sure that the hwEncryptionDisabled file exits
+if [[ ! -e "./hwEncryptionDisabled" ]] 
+then 
+    touch hwEncryptionDisabled
+fi
+
 # Disables hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
-if ! cat hwEncryptionDisabled | grep -q '1';
+if ! cat hwEncryptionDisabled| grep -q '1';
 then 
 	./findVulnerable/krackattack/disable-hwcrypto.sh
 fi

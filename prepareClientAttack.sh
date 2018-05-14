@@ -46,8 +46,14 @@ then
 	echo "Compiling hostapd"
 	cd ./krackattacks-poc-zerokey/hostapd/
 	cp defconfig .config
-	make -j 2 1>/dev/null
+	make -j 2 1> /dev/null
 	cd ../../
+fi
+
+# Make sure that the hwEncryptionDisabled file exits
+if [[ ! -e "./hwEncryptionDisabled" ]] 
+then 
+    touch hwEncryptionDisabled
 fi
 
 # Disable hardware encryption, as bugs on some Wi-Fi network interface cards could interfere with the script used to check whether a client is vulnerable
