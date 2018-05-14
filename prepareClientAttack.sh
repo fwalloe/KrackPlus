@@ -46,7 +46,7 @@ then
 	echo "Compiling hostapd"
 	cd ./krackattacks-poc-zerokey/hostapd/
 	cp defconfig .config
-	make -j 2 > /dev/null
+	make -j 2 &>/dev/null
 	cd ../../
 fi
 
