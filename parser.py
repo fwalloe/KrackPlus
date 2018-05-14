@@ -26,7 +26,7 @@ def scanParser():
 
         # goes through the file line by line
         while should_continue:
-            time.sleep(0.5)
+            time.sleep(0.2)
 			# Go through the file line by line, filter out interesting lines and parse them
             for line in output.readlines():
 
@@ -71,9 +71,9 @@ def scanParser():
 def attackParser():
 	with open('./attackOutput.txt', 'r') as output:
 		while True:
-			for line in output.readlines():
-				
-				# Displays lines that contain any of the following strings
+                        time.sleep(0.2)
+    			for line in output.readlines():
+			        # Displays lines that contain any of the following strings
 				if (
 				str("Note") in line
 				or str("Established MitM") in line 
@@ -87,12 +87,13 @@ def attackParser():
 				or str("Performing key reinstallation attack!") in line 
 				or str("forwarding EAPOL msg3") in line
 				or str("Deauth") in line
-				or str("failed") in line
 				or str("WARNING") in line
 				or str("SUCCESS") in line
 				or str("interceptig its traffic") in line
 				or str("hostapd") in line ):
 					print line
+                                if (str("failed") in line):
+                                    print ("!!! Attack appears to have failed !!!")
 
 # Writes the results of the scan to files
 ## it calls the writeParser to ensure that the hashmaps contain the results 
