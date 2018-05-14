@@ -44,16 +44,3 @@ sudo service networking restart > /dev/null
 nmcli radio wifi off > /dev/null
 nmcli radio wifi on > /dev/null
 
-# Loop over and try to restore interfaces by name
-#for i in {1..3}
-#do
-#	wlanName=$(ifconfig -a | sed 's/[ \t].*//;/^$/d' | awk "FNR==3" | tr -d ':')
-
-#	if ! echo $wlanName | grep -q 'w';
-#	then
-#		ifconfig $wlanName down > /dev/null
-#		iwconfig $wlanName mode managed > /dev/null
-#		ifconfig $wlanName up > /dev/null
-#	fi
-#done
-
