@@ -37,11 +37,11 @@ log.addHandler(stream)
 #log.error("Serious stuff, this is red for a reason")                 RED
 #log.critical("OH NO everything is on fire")                          SUPER RED/ORANGE
 
-log.debug("KrackPlus is a tool to scan for and exploit the KRACK vulnerability in WPA2(CVE-2017-13077 & CVE-2017-13080), discovered by Mathy Vanhoef.")
+log.debug("KrackPlus is a tool to scan for and exploit the KRACK vulnerability in WPA2(CVE-2017-13077, CVE-2017-13078 & CVE-2017-13080 (--group)), discovered by Mathy Vanhoef.")
 log.debug("KrackPlus 1.0 by Lars Magnus Trinborgholen, Fredrik Walloe and Lars Kristian Maehlum.\n")
 
 def main():
-    USAGE = "\nKrackPlus Scan:   ./krackPlus.py [-s]\n\t          ./krackPlus.py [-s] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKrackPlus Attack: ./krackPlus.py [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address] [--continuous-csa] [--group] [--pcap FILENAME]"
+    USAGE = "\nKrackPlus Scan:   ./krackPlus.py [-s]\n\t          ./krackPlus.py [-s] [--group] [--set-ssid SSID] [--set-password PASSWORD] [--path PATH]\nKrackPlus Attack: ./krackPlus.py [-a] [--nic-mon NIC] [--nic-rogue-ap NIC] [--target-ssid SSID] [--target MAC-address] [--continuous-csa] [--pcap FILENAME]"
 
     parser = optparse.OptionParser(usage=USAGE)
 
@@ -76,14 +76,14 @@ def main():
     
     # General KRACK+ options:
     parser.add_option('--restore', '-r', help="This option will restore internet connection (wifi). Hopefully you'll never have to use this option.", dest='restore', default=False, action='store_true')
-    parser.add_option('-d', help="This option will increase output verbosity for KRACK+ Scan or Attack", dest='debug', action='store_true')
-    parser.add_option('--dd', help="This option will increase output verbosity even more for KRACK+ Scan or Attack (debugging purposes). Can be combined with -d", dest='dd', action='store_true') 
+    parser.add_option('-d', help="This option will increase output verbosity for KrackPlus Scan or Attack", dest='debug', action='store_true')
+    parser.add_option('--dd', help="This option will increase output verbosity even more for KrackPlus Scan or Attack (debugging purposes). Can be combined with -d", dest='dd', action='store_true') 
     
     options, args = parser.parse_args()
     
     ############# SCAN ################
     if options.scan and not options.attack:
-        # Write the credentials to file, so that they can be used next time the progran runs.
+        # Write the credentials to file, so that they can be used next time the program runs.
         with open('./networkCredentials.txt', 'w') as netCredentials:
             if len(options.password) >= 8:
                 netCredentials.write(options.ssid + '\n' + options.password)
@@ -252,11 +252,12 @@ def main():
         subprocess.call(["./restoreClientWifi.sh"])
         log.info("Done, it'll take a few seconds for the client to connect to your Wi-Fi again, if 'auto-reconnect' is enabled on your device")
 
-    ########## NO OPTION OR WRONG USAGE ###########    
+    ########## WRONG USAGE ###########    
     elif options.attack and options.scan:
         log.warn("Scan and attack cannot be run simultaneously. Please specify either [-a] or [-s].")
         parser.print_help()
-        
+
+    ######## NO OPTION GIVEN #########
     else:
         log.warn("No option was given or there were missing arguments, please see usage below and try again!")
         parser.print_help()
