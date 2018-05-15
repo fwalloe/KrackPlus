@@ -14,13 +14,13 @@ mac = ''
 ip = ''
 
 # parses the output of a scan to display only key information to user
-def scanParser():
+def scanParser(runforever):
     with open('./scanOutput.txt', 'r') as output:
         mac = ''
         ip = ''
         counter = 0
         time_since_last_connected_device = 0
-        PERIOD_OF_TIME = 90 # 1.5min
+        PERIOD_OF_TIME = 15 # 1.5min
         number_of_connected_devices = 0
         should_continue=True
 
@@ -62,7 +62,7 @@ def scanParser():
                             print (mac+" is vulnerable to pairwise")
 
                 # if no new devices have connected for 1.5 minutes, stop the scan. 
-                if time.time() > time_since_last_connected_device + PERIOD_OF_TIME and time_since_last_connected_device > 0:
+                if time.time() > time_since_last_connected_device + PERIOD_OF_TIME and time_since_last_connected_device > 0 and not runforever:
                     should_continue = False
                     break
                   

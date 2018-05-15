@@ -58,6 +58,7 @@ def main():
                       " Password length has to be 8 characters or more!", dest='password')
     parser.add_option('--path', '-p', help="Set path where scan report should be saved", dest='path')
     parser.add_option("--group", help="Only perform scan of  the group key handshake", dest='group', action='store_true')
+    parser.add_option("--runforever", help="Scan will end after 90 seconds of the last connected device. This option will disable this and make it run forever.", action='store_true')
  # KRACK+ Attack options
     # Required arguments
     parser.add_option('--attack', '-a', default=False, help="This option will run a key reinstallation attack against ....", dest='attack', action='store_true')
@@ -104,11 +105,11 @@ def main():
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --debug"], shell=True)
                 elif options.group:
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py --group &"], stdout=scanOutput, shell=True)
-                    scanParser()
+                    scanParser(options.runforever)
                     raise KeyboardInterrupt 
                 else:
                     subprocess.call(["./findVulnerable/krackattack/krack-test-client.py &"], stdout=scanOutput, shell=True)
-                    scanParser()
+                    scanParser(options.runforever)
                     raise KeyboardInterrupt 
                     
         except(KeyboardInterrupt, SystemExit):
