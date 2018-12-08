@@ -1,6 +1,6 @@
 # KRACK+ #
 
-KrackPlus seeks to handle dependencies and parse the output from two scripts made by Mathy Vanhoef, that lets users scan their devices (to determine whether they are vulnerable to key reinstallation attacks) and attack those devices.
+*KrackPlus* seeks to handle dependencies and parse the output from two scripts made by Mathy Vanhoef, that lets users scan their devices (to determine whether they are vulnerable to key reinstallation attacks) and attack those devices.
 
 Users can run a scan or an attack with a single command – all dependencies are handled in the background.
 
@@ -13,7 +13,7 @@ Lars Kristian Mæhlum
 
 ## Usage ###
 
-Run KrackPlus.py to see a usage guide.
+Run *KrackPlus.py* to see a usage guide.
 
 ## Files ##
 *KrackPlus.py:* graphical user interface for KrackPlus.
